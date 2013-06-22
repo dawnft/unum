@@ -1,6 +1,6 @@
 # unum
 --
-    import "github.com/metaleap/go-util/num"
+    import "github.com/go-utils/unum"
 
 Go programming helpers for common maths needs; plus vectors, matrices and quaternions.
 
