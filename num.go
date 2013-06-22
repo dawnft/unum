@@ -19,7 +19,7 @@ var (
 	Epsilon64 = math.Nextafter(1, Infinity) - 1
 )
 
-//	Returns true if all vals equal test.
+//	Returns whether all `vals` equal `test`.
 func AllEqual(test float64, vals ...float64) bool {
 	for i := 0; i < len(vals); i++ {
 		if vals[i] != test {
@@ -29,7 +29,7 @@ func AllEqual(test float64, vals ...float64) bool {
 	return true
 }
 
-//	Clamps val between c0 and c1
+//	Clamps `val` between `c0` and `c1`.
 func Clamp(val, c0, c1 float64) float64 {
 	// return math.Min(math.Max(val, c0), c1)
 	if val < c0 {
@@ -41,19 +41,19 @@ func Clamp(val, c0, c1 float64) float64 {
 	return val
 }
 
-//	Converts the specified degrees to radians.
-func DegToRad(deg float64) float64 {
-	return PiDiv180 * deg
+//	Converts the specified `degrees` to radians.
+func DegToRad(degrees float64) float64 {
+	return PiDiv180 * degrees
 }
 
-//	Returns the "normalized ratio" of val to max.
-//	Example: for max = 900 and val = 300, returns 0.33333.
+//	Returns the "normalized ratio" of `val` to `max`.
+//	Example: for `max = 900` and `val = 300`, returns `0.33333..`.
 func Din1(val, max float64) float64 {
 	return 1 / (max / val)
 }
 
-//	Returns the "normalized ratio" of val to max.
-//	Example: for max = 900 and val = 300, returns 0.33333.
+//	Returns the "normalized ratio" of `val` to `max`.
+//	Example: for `max = 900` and `val = 300`, returns `0.33333..`.
 func Fin1(val, max float32) float32 {
 	return 1 / (max / val)
 }
@@ -80,18 +80,18 @@ func Iin1 (val, max int) int {
 }
 */
 
-//	Returns true if val is even
+//	Returns whether `val` is even.
 func IsEven(val int) bool {
 	return (math.Mod(float64(val), 2) == 0)
 }
 
-//	Returns true if val represents an integer
+//	Returns whether `val` represents an integer.
 func IsInt(val float64) bool {
 	_, f := math.Modf(val)
 	return (f == 0)
 }
 
-//	Returns true if math.Mod(v, m) is zero
+//	Returns whether `math.Mod(v, m)` is 0.
 func IsMod0(v, m int) bool {
 	return (math.Mod(float64(v), float64(m)) == 0)
 }
@@ -118,7 +118,7 @@ func Min (x, y float64) float64 {
 }
 */
 
-//	Returns the smaller of two values.
+//	Returns the smaller of two `int` values.
 func Mini(v1, v2 int) int {
 	if v1 < v2 {
 		return v1
@@ -126,7 +126,7 @@ func Mini(v1, v2 int) int {
 	return v2
 }
 
-//	Returns x if a is 0, y if a is 1, or a corresponding mix of both if a is between 0 and 1.
+//	Returns `x` if `a` is 0, or `y` if `a` is 1, or else a corresponding mix of both if `a` is between 0 and 1.
 func Mix(x, y, a float64) float64 {
 	return (x * y) + ((1 - y) * a)
 }
@@ -150,12 +150,12 @@ func Nextafter32(x, y float64) (r float64) {
 	return
 }
 
-//	Converts the specified radians to degrees.
-func RadToDeg(rad float64) float64 {
-	return rad * PiDiv180
+//	Converts the specified `radians` to degrees.
+func RadToDeg(radians float64) float64 {
+	return radians * PiDiv180
 }
 
-//	Returns (the equivalent of) math.Ceil(v) if fraction >= 0.5, otherwise returns (the equivalent of) math.Floor(v).
+//	Returns (the equivalent of) `math.Ceil(v)` if fraction >= 0.5, otherwise returns (the equivalent of) `math.Floor(v)`.
 func Round(v float64) (fint float64) {
 	var frac float64
 	if fint, frac = math.Modf(v); frac >= 0.5 {
@@ -164,12 +164,12 @@ func Round(v float64) (fint float64) {
 	return
 }
 
-//	Clamps v between 0 and 1.
+//	Clamps `v` between 0 and 1.
 func Saturate(v float64) float64 {
 	return Clamp(v, 0, 1)
 }
 
-//	Returns -1 if v is negative, 1 if v is positive, or 0 if v is zero.
+//	Returns -1 if `v` is negative, 1 if `v` is positive, or 0 if `v` is zero.
 func Sign(v float64) (sign float64) {
 	if v > 0 {
 		sign = 1
@@ -180,7 +180,7 @@ func Sign(v float64) (sign float64) {
 	// return v / math.Abs(v)
 }
 
-//	Returns 0 if x < edge, otherwise returns 1.
+//	Returns 0 if `x` less-than `edge`, otherwise returns 1.
 func Step(edge, x float64) (step int) {
 	if edge >= x {
 		step = 1

@@ -21,7 +21,7 @@ func init() {
 	Mat4Identity[3], Mat4Identity[7], Mat4Identity[11], Mat4Identity[15] = 0, 0, 0, 1
 }
 
-//	Returns a Mat4 where each cell represents the absolute value of the corresponding cell in me.
+//	Returns a new `*Mat4` with each cell representing the `math.Abs()` value of the respective corresponding cell in `me`.
 func (me *Mat4) Abs() (abs *Mat4) {
 	abs = new(Mat4)
 	for i := 0; i < len(*me); i++ {
@@ -30,7 +30,7 @@ func (me *Mat4) Abs() (abs *Mat4) {
 	return
 }
 
-//	Adds mat to this 4x4 matrix.
+//	Adds `mat` to `me`.
 func (me *Mat4) Add(mat *Mat4) {
 	me[0], me[4], me[8], me[12] = me[0]+mat[0], me[4]+mat[4], me[8]+mat[8], me[12]+mat[12]
 	me[1], me[5], me[9], me[13] = me[1]+mat[1], me[5]+mat[5], me[9]+mat[9], me[13]+mat[13]
@@ -38,29 +38,29 @@ func (me *Mat4) Add(mat *Mat4) {
 	me[3], me[7], me[11], me[15] = me[3]+mat[3], me[7]+mat[7], me[11]+mat[11], me[15]+mat[15]
 }
 
-//	Zeroes this 4x4 matrix.
+//	Zeroes all cells in `me`.
 func (me *Mat4) Clear() {
 	*me = m4z
 }
 
-//	Returns a pointer to a newly allocated copy of me.
+//	Returns a new `*Mat` containing a copy of `me`.
 func (me *Mat4) Clone() (mat *Mat4) {
 	mat = new(Mat4)
 	me.CopyTo(mat)
 	return
 }
 
-//	Sets this 4x4 matrix to the same values as mat.
+//	Copies all cells from `mat` to `me`.
 func (me *Mat4) CopyFrom(mat *Mat4) {
 	*me = *mat
 }
 
-//	Sets mat to the same values as this 4x4 matrix.
+//	Copies all cells from `me` to `mat`.
 func (me *Mat4) CopyTo(mat *Mat4) {
 	*mat = *me
 }
 
-//	Sets this 4x4 matrix to represent the specified frustum.
+//	Sets `me` to represent the specified frustum.
 func (me *Mat4) Frustum(left, right, bottom, top, near, far float64) {
 	me[0], me[4], me[8], me[12] = ((near * 2) / (right - left)), 0, ((right + left) / (right - left)), 0
 	me[1], me[5], me[9], me[13] = 0, ((near * 2) / (top - bottom)), ((top + bottom) / (top - bottom)), 0
@@ -68,12 +68,12 @@ func (me *Mat4) Frustum(left, right, bottom, top, near, far float64) {
 	me[3], me[7], me[11], me[15] = 0, 0, -1, 0
 }
 
-//	Sets this 4x4 matrix to Mat4Identity.
+//	Copies all cells from `Mat4Identity` to `me`.
 func (me *Mat4) Identity() {
 	*me = Mat4Identity
 }
 
-//	Sets me to the "look-at matrix" computed from the specified vectors.
+//	Sets `me` to the "look-at matrix" computed from the specified vectors.
 func (me *Mat4) Lookat(eyePos, lookTarget, upVec *Vec3) {
 	l := lookTarget.Sub(eyePos)
 	l.Normalize()
@@ -86,7 +86,7 @@ func (me *Mat4) Lookat(eyePos, lookTarget, upVec *Vec3) {
 	me[3], me[7], me[11], me[15] = 0, 0, 0, 1
 }
 
-//	Sets me to the "orientation matrix" computed from the specified vectors.
+//	Sets `me` to the "orientation matrix" computed from the specified vectors.
 func (me *Mat4) Orient(lookTarget, worldUp *Vec3) {
 	var tvN, tvU, tvV Vec3
 	tvN.SetFromNormalized(lookTarget)
@@ -98,7 +98,7 @@ func (me *Mat4) Orient(lookTarget, worldUp *Vec3) {
 	me[3], me[7], me[11], me[15] = 0, 0, 0, 1
 }
 
-//	Multiplies all values in this 4x4 matrix with v.
+//	Multiplies all cells in `me` with `v`.
 func (me *Mat4) Mult1(v float64) {
 	me[0], me[4], me[8], me[12] = me[0]*v, me[4]*v, me[8]*v, me[12]*v
 	me[1], me[5], me[9], me[13] = me[1]*v, me[5]*v, me[9]*v, me[13]*v
@@ -106,8 +106,9 @@ func (me *Mat4) Mult1(v float64) {
 	me[3], me[7], me[11], me[15] = me[3]*v, me[7]*v, me[11]*v, me[15]*v
 }
 
-//	Sets this 4x4 matrix to the specified perspective-projection matrix.
-//	fovYRad: vertical field-of-view angle in radians. a: aspect ratio. n: near-plane. f: far-plane.
+//	Sets `me` to the specified perspective-projection matrix.
+//
+//	`fovYRad` -- vertical field-of-view angle in radians. `a` -- aspect ratio. `n` -- near-plane. `f` -- far-plane.
 func (me *Mat4) Perspective(fovYDeg, a, n, f float64) (fovYRadHalf float64) {
 	fovYRadHalf = DegToRad(fovYDeg) * 0.5
 	s := 1 / math.Tan(fovYRadHalf) // scaling
@@ -130,7 +131,7 @@ func (me *Mat4) Rotation (rad float64, axes *Vec3) {
 }
 */
 
-//	Sets this 4x4 matrix to a rotation matrix representing "rotate rad radians around the X asis".
+//	Sets `me` to a rotation matrix representing "rotate `rad` radians around the X axis".
 func (me *Mat4) RotationX(rad float64) {
 	cos, sin := math.Cos(rad), math.Sin(rad)
 	me[0], me[4], me[8], me[12] = 1, 0, 0, 0
@@ -139,7 +140,7 @@ func (me *Mat4) RotationX(rad float64) {
 	me[3], me[7], me[11], me[15] = 0, 0, 0, 1
 }
 
-//	Sets this 4x4 matrix to a rotation matrix representing "rotate rad radians around the Y asis".
+//	Sets `me` to a rotation matrix representing "rotate `rad` radians around the Y axis".
 func (me *Mat4) RotationY(rad float64) {
 	cos, sin := math.Cos(rad), math.Sin(rad)
 	me[0], me[4], me[8], me[12] = cos, 0, sin, 0
@@ -148,7 +149,7 @@ func (me *Mat4) RotationY(rad float64) {
 	me[3], me[7], me[11], me[15] = 0, 0, 0, 1
 }
 
-//	Sets this 4x4 matrix to a rotation matrix representing "rotate rad radians around the Z asis".
+//	Sets `me` to a rotation matrix representing "rotate `rad` radians around the Z axis".
 func (me *Mat4) RotationZ(rad float64) {
 	cos, sin := math.Cos(rad), math.Sin(rad)
 	me[0], me[4], me[8], me[12] = cos, -sin, 0, 0
@@ -157,7 +158,7 @@ func (me *Mat4) RotationZ(rad float64) {
 	me[3], me[7], me[11], me[15] = 0, 0, 0, 1
 }
 
-//	Sets this 4x4 matrix to a transformation matrix representing "scale by vec"
+//	Sets `me` to a transformation matrix representing "scale by `vec`"
 func (me *Mat4) Scaling(vec *Vec3) {
 	me[0], me[4], me[8], me[12] = vec.X, 0, 0, 0
 	me[1], me[5], me[9], me[13] = 0, vec.Y, 0, 0
@@ -165,7 +166,7 @@ func (me *Mat4) Scaling(vec *Vec3) {
 	me[3], me[7], me[11], me[15] = 0, 0, 0, 1
 }
 
-//	Sets this 4x4 matrix to the result of multiplying one with two.
+//	Sets `me` to the result of multiplying `one` times `two`.
 func (me *Mat4) SetFromMult4(one, two *Mat4) {
 	me[0], me[4], me[8], me[12] = (one[0]*two[0])+(one[4]*two[1])+(one[8]*two[2])+(one[12]*two[3]), (one[0]*two[4])+(one[4]*two[5])+(one[8]*two[6])+(one[12]*two[7]), (one[0]*two[8])+(one[4]*two[9])+(one[8]*two[10])+(one[12]*two[11]), (one[0]*two[12])+(one[4]*two[13])+(one[8]*two[14])+(one[12]*two[15])
 	me[1], me[5], me[9], me[13] = (one[1]*two[0])+(one[5]*two[1])+(one[9]*two[2])+(one[13]*two[3]), (one[1]*two[4])+(one[5]*two[5])+(one[9]*two[6])+(one[13]*two[7]), (one[1]*two[8])+(one[5]*two[9])+(one[9]*two[10])+(one[13]*two[11]), (one[1]*two[12])+(one[5]*two[13])+(one[9]*two[14])+(one[13]*two[15])
@@ -173,7 +174,7 @@ func (me *Mat4) SetFromMult4(one, two *Mat4) {
 	me[3], me[7], me[11], me[15] = (one[3]*two[0])+(one[7]*two[1])+(one[11]*two[2])+(one[15]*two[3]), (one[3]*two[4])+(one[7]*two[5])+(one[11]*two[6])+(one[15]*two[7]), (one[3]*two[8])+(one[7]*two[9])+(one[11]*two[10])+(one[15]*two[11]), (one[3]*two[12])+(one[7]*two[13])+(one[11]*two[14])+(one[15]*two[15])
 }
 
-//	Sets this 4x4 matrix to the result of multiplying all the specified mats with one another.
+//	Sets `me` to the result of multiplying all the specified `mats` with one another.
 func (me *Mat4) SetFromMultN(mats ...*Mat4) {
 	var (
 		m0     Mat4
@@ -192,7 +193,7 @@ func (me *Mat4) SetFromMultN(mats ...*Mat4) {
 	}
 }
 
-//	Sets me to the transpose of mat.
+//	Sets `me` to the transpose of `mat`.
 func (me *Mat4) SetFromTransposeOf(mat *Mat4) {
 	me[0], me[4], me[8], me[12] = mat[0], mat[1], mat[2], mat[3]
 	me[1], me[5], me[9], me[13] = mat[4], mat[5], mat[6], mat[7]
@@ -200,14 +201,14 @@ func (me *Mat4) SetFromTransposeOf(mat *Mat4) {
 	me[3], me[7], me[11], me[15] = mat[12], mat[13], mat[14], mat[15]
 }
 
-//	Returns the transpose of me.
+//	Returns the transpose of `me`.
 func (me *Mat4) Transposed() (mat *Mat4) {
 	mat = new(Mat4)
 	mat.SetFromTransposeOf(me)
 	return
 }
 
-//	Subtracts mat from this 4x4 matrix.
+//	Subtracts `mat` from `me`.
 func (me *Mat4) Sub(mat *Mat4) {
 	me[0], me[4], me[8], me[12] = me[0]-mat[0], me[4]-mat[4], me[8]-mat[8], me[12]-mat[12]
 	me[1], me[5], me[9], me[13] = me[1]-mat[1], me[5]-mat[5], me[9]-mat[9], me[13]-mat[13]
@@ -215,9 +216,9 @@ func (me *Mat4) Sub(mat *Mat4) {
 	me[3], me[7], me[11], me[15] = me[3]-mat[3], me[7]-mat[7], me[11]-mat[11], me[15]-mat[15]
 }
 
-//	Sets the specified 3x3 matrix to the inverse of me.
-//	This method is currently in "not needed right now and not sure if actually correct" limbo.
+//	Sets `mat` to the inverse of `me`.
 func (me *Mat4) ToInverseMat3(mat *Mat3) {
+	//	This method is currently in "not needed right now and not sure if actually correct" limbo.
 	a00, a01, a02 := me[0], me[1], me[2]
 	a10, a11, a12 := me[4], me[5], me[6]
 	a20, a21, a22 := me[8], me[9], me[10]
@@ -232,7 +233,7 @@ func (me *Mat4) ToInverseMat3(mat *Mat3) {
 	mat[2], mat[5], mat[8] = (a12*a01-a02*a11)*dInv, (-a12*a00+a02*a10)*dInv, (a11*a00-a01*a10)*dInv
 }
 
-//	Sets this 4x4 matrix to a transformation matrix representing "translate by vec"
+//	Sets `me` to a transformation matrix representing "translate by `vec`"
 func (me *Mat4) Translation(vec *Vec3) {
 	me[0], me[4], me[8], me[12] = 1, 0, 0, vec.X
 	me[1], me[5], me[9], me[13] = 0, 1, 0, vec.Y
@@ -240,14 +241,14 @@ func (me *Mat4) Translation(vec *Vec3) {
 	me[3], me[7], me[11], me[15] = 0, 0, 0, 1
 }
 
-//	Calls the Identity() method on all specified mats.
+//	Calls the `Identity()` method on all specified `mats`.
 func Mat4Identities(mats ...*Mat4) {
 	for _, mat := range mats {
 		mat.Identity()
 	}
 }
 
-//	Returns a new 4x4 matrix representing the result of adding a to b.
+//	Returns a new `*Mat4` representing the result of adding `a` to `b`.
 func NewMat4Add(a, b *Mat4) (mat *Mat4) {
 	mat = new(Mat4)
 	mat[0], mat[4], mat[8], mat[12] = a[0]+b[0], a[4]+b[4], a[8]+b[8], a[12]+b[12]
@@ -257,35 +258,35 @@ func NewMat4Add(a, b *Mat4) (mat *Mat4) {
 	return
 }
 
-//	Returns a new 4x4 matrix representing the specified frustum.
+//	Returns a new `*Mat4` representing the specified frustum.
 func NewMat4Frustum(left, right, bottom, top, near, far float64) (mat *Mat4) {
 	mat = new(Mat4)
 	mat.Frustum(left, right, bottom, top, near, far)
 	return
 }
 
-//	Returns a new 4x4 matrix representing the identity matrix.
+//	Returns a new `*Mat4` representing the identity matrix.
 func NewMat4Identity() (mat *Mat4) {
 	mat = new(Mat4)
 	mat.Identity()
 	return
 }
 
-//	Returns a new 4x4 matrix representing the "orientation matrix" computed from the specified vectors.
+//	Returns a new `*Mat4` representing the "orientation matrix" computed from the specified vectors.
 func NewMat4Orient(lookTarget, worldUp *Vec3) (mat *Mat4) {
 	mat = new(Mat4)
 	mat.Orient(lookTarget, worldUp)
 	return
 }
 
-//	Returns a new 4x4 matrix representing the "look-at matrix" computed from the specified vectors.
+//	Returns a new `*Mat4` representing the "look-at matrix" computed from the specified vectors.
 func NewMat4Lookat(eyePos, lookTarget, upVec *Vec3) (mat *Mat4) {
 	mat = new(Mat4)
 	mat.Lookat(eyePos, lookTarget, upVec)
 	return
 }
 
-//	Returns a new 4x4 matrix representing the result of multiplying all values in m with v.
+//	Returns a new `*Mat4` representing the result of multiplying all values in `m` with `v`.
 func NewMat4Mult1(m *Mat4, v float64) (mat *Mat4) {
 	mat = new(Mat4)
 	mat[0], mat[4], mat[8], mat[12] = m[0]*v, m[4]*v, m[8]*v, m[12]*v
@@ -295,21 +296,21 @@ func NewMat4Mult1(m *Mat4, v float64) (mat *Mat4) {
 	return
 }
 
-//	Returns a new 4x4 matrix that represents the result of multiplying one with two.
+//	Returns a new `*Mat4` that represents the result of multiplying `one` with `two`.
 func NewMat4Mult4(one, two *Mat4) (mat *Mat4) {
 	mat = new(Mat4)
 	mat.SetFromMult4(one, two)
 	return
 }
 
-//	Returns a new 4x4 matrix that represents the result of multiplying all mats with one another.
+//	Returns a new `*Mat4` that represents the result of multiplying all specified `mats` with one another.
 func NewMat4MultN(mats ...*Mat4) (mat *Mat4) {
 	mat = new(Mat4)
 	mat.SetFromMultN(mats...)
 	return
 }
 
-//	Returns a new 4x4 matrix that represents the specified perspective-projection matrix.
+//	Returns a new `*Mat4` that represents the specified perspective-projection matrix.
 func NewMat4Perspective(fovY, aspect, near, far float64) (mat *Mat4) {
 	mat = new(Mat4)
 	mat.Perspective(fovY, aspect, near, far)
@@ -322,35 +323,35 @@ func NewMat4Rotation (rad float64, axes *Vec3) *Mat4 {
 }
 */
 
-//	Returns a new 4x4 matrix that representing a rotation of rad radians around the X asis.
+//	Returns a new `*Mat4` that represents a rotation of `rad` radians around the X axis.
 func NewMat4RotationX(rad float64) (mat *Mat4) {
 	mat = new(Mat4)
 	mat.RotationX(rad)
 	return
 }
 
-//	Returns a new 4x4 matrix that representing a rotation of rad radians around the Y asis.
+//	Returns a new `*Mat4` that represents a rotation of `rad` radians around the Y axis.
 func NewMat4RotationY(rad float64) (mat *Mat4) {
 	mat = new(Mat4)
 	mat.RotationY(rad)
 	return
 }
 
-//	Returns a new 4x4 matrix that representing a rotation of rad radians around the Z asis.
+//	Returns a new `*Mat4` that represents a rotation of `rad` radians around the Z axis.
 func NewMat4RotationZ(rad float64) (mat *Mat4) {
 	mat = new(Mat4)
 	mat.RotationZ(rad)
 	return
 }
 
-//	Returns a new 4x4 matrix that represents a transformation of "scale by vec".
+//	Returns a new `*Mat4` that represents a transformation of "scale by `vec`".
 func NewMat4Scaling(vec *Vec3) (mat *Mat4) {
 	mat = new(Mat4)
 	mat.Scaling(vec)
 	return
 }
 
-//	Returns a new 4x4 matrix that represents a minus b.
+//	Returns a new `*Mat4` that represents `a` minus `b`.
 func NewMat4Sub(a, b *Mat4) (mat *Mat4) {
 	mat = new(Mat4)
 	mat[0], mat[4], mat[8], mat[12] = a[0]-b[0], a[4]-b[4], a[8]-b[8], a[12]-b[12]
@@ -360,7 +361,7 @@ func NewMat4Sub(a, b *Mat4) (mat *Mat4) {
 	return
 }
 
-//	Returns a new 4x4 matrix that represents a transformation of "translate by vec".
+//	Returns a new `*Mat4` that represents a transformation of "translate by `vec`".
 func NewMat4Translation(vec *Vec3) (mat *Mat4) {
 	mat = new(Mat4)
 	mat.Translation(vec)
