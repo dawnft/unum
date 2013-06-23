@@ -88,14 +88,14 @@ Returns whether `math.Mod(v, m)` is 0.
 ```go
 func Mat3Identities(mats ...*Mat3)
 ```
-Calls the `Identity()` method on all specified `mats`.
+Calls the `Identity` method on all specified `mats`.
 
 #### func  Mat4Identities
 
 ```go
 func Mat4Identities(mats ...*Mat4)
 ```
-Calls the `Identity()` method on all specified `mats`.
+Calls the `Identity` method on all specified `mats`.
 
 #### func  Mini
 
@@ -325,7 +325,7 @@ Returns a new `*Mat4` that represents a transformation of "translate by `vec`".
 ```go
 func (me *Mat4) Abs() (abs *Mat4)
 ```
-Returns a new `*Mat4` with each cell representing the `math.Abs()` value of the
+Returns a new `*Mat4` with each cell representing the `math.Abs` value of the
 respective corresponding cell in `me`.
 
 #### func (*Mat4) Add
@@ -597,7 +597,7 @@ Represents a 3-dimensional vector.
 ```go
 func (me *Vec3) AbsMax() float64
 ```
-Returns the `math.Max()` of the `math.Abs()` values of all 3 components in `me`.
+Returns the `math.Max` of the `math.Abs` values of all 3 components in `me`.
 
 #### func (*Vec3) Add
 
@@ -922,7 +922,7 @@ func (me *Vec3) SetFromAddSub(a, b, c *Vec3)
 ```go
 func (me *Vec3) SetFromCos(vec *Vec3)
 ```
-Sets each vector component in `me` to the `math.Cos()` of the respective
+Sets each vector component in `me` to the `math.Cos` of the respective
 corresponding component in `vec`.
 
 #### func (*Vec3) SetFromCross
@@ -1017,7 +1017,7 @@ func (me *Vec3) SetFromScaledSub(vec1, vec2 *Vec3, mul float64)
 ```go
 func (me *Vec3) SetFromSin(vec *Vec3)
 ```
-Sets each vector component in `me` to the `math.Sin()` of the respective
+Sets each vector component in `me` to the `math.Sin` of the respective
 corresponding component in `vec`.
 
 #### func (*Vec3) SetFromStep
@@ -1232,7 +1232,7 @@ Sets `me` to the result of multiplying the specified `*Mat4` with the specified
 ```go
 func (me *Vec4) Normalize()
 ```
-Normalizes `me` according to `me.Magnitude()`.
+Normalizes `me` according to `me.Magnitude`.
 
 #### func (*Vec4) NormalizeFrom
 
@@ -1247,7 +1247,7 @@ Normalizes `me` according to the specified `magnitude`.
 func (me *Vec4) Normalized() *Vec4
 ```
 Returns a new `*Vec4` that represents `me` normalized according to
-`me.Magnitude()`.
+`me.Magnitude`.
 
 #### func (*Vec4) Scale
 
@@ -1269,7 +1269,7 @@ Sets `me` to `c` conjugated.
 func (me *Vec4) SetFromMult(l, r *Vec4)
 ```
 Applies various 4D vector component computations of `l` and `r` to `me`, as
-needed by the `Vec3.RotateRad()` method.
+needed by the `Vec3.RotateRad` method.
 
 #### func (*Vec4) SetFromMult3
 
@@ -1277,7 +1277,7 @@ needed by the `Vec3.RotateRad()` method.
 func (me *Vec4) SetFromMult3(q *Vec4, v *Vec3)
 ```
 Applies various 4D vector component computations of `q` and `v` to `me`, as
-needed by the `Vec3.RotateRad()` method.
+needed by the `Vec3.RotateRad` method.
 
 #### func (*Vec4) SetFromMultMat4
 

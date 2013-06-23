@@ -21,7 +21,7 @@ func init() {
 	Mat4Identity[3], Mat4Identity[7], Mat4Identity[11], Mat4Identity[15] = 0, 0, 0, 1
 }
 
-//	Returns a new `*Mat4` with each cell representing the `math.Abs()` value of the respective corresponding cell in `me`.
+//	Returns a new `*Mat4` with each cell representing the `math.Abs` value of the respective corresponding cell in `me`.
 func (me *Mat4) Abs() (abs *Mat4) {
 	abs = new(Mat4)
 	for i := 0; i < len(*me); i++ {
@@ -241,7 +241,7 @@ func (me *Mat4) Translation(vec *Vec3) {
 	me[3], me[7], me[11], me[15] = 0, 0, 0, 1
 }
 
-//	Calls the `Identity()` method on all specified `mats`.
+//	Calls the `Identity` method on all specified `mats`.
 func Mat4Identities(mats ...*Mat4) {
 	for _, mat := range mats {
 		mat.Identity()

@@ -9,7 +9,7 @@ type Vec3 struct {
 	X, Y, Z float64
 }
 
-//	Returns the `math.Max()` of the `math.Abs()` values of all 3 components in `me`.
+//	Returns the `math.Max` of the `math.Abs` values of all 3 components in `me`.
 func (me *Vec3) AbsMax() float64 {
 	return math.Max(math.Abs(me.X), math.Max(math.Abs(me.Y), math.Abs(me.Z)))
 }
@@ -299,7 +299,7 @@ func (me *Vec3) SetFromAddSub(a, b, c *Vec3) {
 	me.X, me.Y, me.Z = a.X+b.X-c.X, a.Y+b.Y-c.Y, a.Z+b.Z-c.Z
 }
 
-//	Sets each vector component in `me` to the `math.Cos()` of the respective corresponding component in `vec`.
+//	Sets each vector component in `me` to the `math.Cos` of the respective corresponding component in `vec`.
 func (me *Vec3) SetFromCos(vec *Vec3) {
 	me.X, me.Y, me.Z = math.Cos(vec.X), math.Cos(vec.Y), math.Cos(vec.Z)
 }
@@ -385,7 +385,7 @@ func (me *Vec3) SetFromRotation(pos, rotCos, rotSin *Vec3) {
 	me.Z = (-pos.X * rotSin.Y) + (tmpVal * rotCos.Y)
 }
 
-//	Sets each vector component in `me` to the `math.Sin()` of the respective corresponding component in `vec`.
+//	Sets each vector component in `me` to the `math.Sin` of the respective corresponding component in `vec`.
 func (me *Vec3) SetFromSin(vec *Vec3) {
 	me.X, me.Y, me.Z = math.Sin(vec.X), math.Sin(vec.Y), math.Sin(vec.Z)
 }

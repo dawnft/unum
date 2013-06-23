@@ -41,7 +41,7 @@ func (me *Vec4) Magnitude() float64 {
 	return math.Sqrt(me.Length())
 }
 
-//	Normalizes `me` according to `me.Magnitude()`.
+//	Normalizes `me` according to `me.Magnitude`.
 func (me *Vec4) Normalize() {
 	me.NormalizeFrom(me.Magnitude())
 }
@@ -56,7 +56,7 @@ func (me *Vec4) NormalizeFrom(magnitude float64) {
 	}
 }
 
-//	Returns a new `*Vec4` that represents `me` normalized according to `me.Magnitude()`.
+//	Returns a new `*Vec4` that represents `me` normalized according to `me.Magnitude`.
 func (me *Vec4) Normalized() *Vec4 {
 	var q Vec4
 	if mag := me.Magnitude(); mag != 0 {
@@ -71,7 +71,7 @@ func (me *Vec4) SetFromConjugated(c *Vec4) {
 	me.X, me.Y, me.Z, me.W = -c.X, -c.Y, -c.Z, c.W
 }
 
-//	Applies various 4D vector component computations of `l` and `r` to `me`, as needed by the `Vec3.RotateRad()` method.
+//	Applies various 4D vector component computations of `l` and `r` to `me`, as needed by the `Vec3.RotateRad` method.
 func (me *Vec4) SetFromMult(l, r *Vec4) {
 	me.W = (l.W * r.W) - (l.X * r.X) - (l.Y * r.Y) - (l.Z * r.Z)
 	me.X = (l.X * r.W) + (l.W * r.X) + (l.Y * r.Z) - (l.Z * r.Y)
@@ -100,7 +100,7 @@ func (me *Vec4) MultMat4Vec4(mat *Mat4, vec *Vec4) {
 	me.W = (mat[3] * vec.X) + (mat[7] * vec.Y) + (mat[11] * vec.Z) + (mat[15] * vec.W)
 }
 
-//	Applies various 4D vector component computations of `q` and `v` to `me`, as needed by the `Vec3.RotateRad()` method.
+//	Applies various 4D vector component computations of `q` and `v` to `me`, as needed by the `Vec3.RotateRad` method.
 func (me *Vec4) SetFromMult3(q *Vec4, v *Vec3) {
 	me.W = -(q.X * v.X) - (q.Y * v.Y) - (q.Z * v.Z)
 	me.X = (q.W * v.X) + (q.Y * v.Z) - (q.Z * v.Y)

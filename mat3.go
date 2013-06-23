@@ -31,7 +31,7 @@ func (me *Mat3) Transpose() {
 	me[1], me[2], me[3], me[5], me[6], me[7] = me[3], me[6], me[1], me[7], me[2], me[5]
 }
 
-//	Calls the `Identity()` method on all specified `mats`.
+//	Calls the `Identity` method on all specified `mats`.
 func Mat3Identities(mats ...*Mat3) {
 	for _, mat := range mats {
 		mat.Identity()
