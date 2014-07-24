@@ -403,7 +403,7 @@ func (me *Vec3) SetFromSin(vec *Vec3) {
 }
 
 //	Component-wise, set `me` to `v0` if vec is less than `edge`, else `v1`.
-func (me *Vec3) SetFromStep(edge float64, vec, v0, v1 *Vec3) {
+func (me *Vec3) setFromStep(edge float64, vec, v0, v1 *Vec3) {
 	me.X = ugo.Ifd(vec.X < edge, v0.X, v1.X)
 	me.Y = ugo.Ifd(vec.Y < edge, v0.Y, v1.Y)
 	me.Z = ugo.Ifd(vec.Z < edge, v0.Z, v1.Z)

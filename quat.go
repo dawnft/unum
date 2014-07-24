@@ -10,6 +10,11 @@ func NewQuat(x, y, z, w float64) *Quat {
 	return &q
 }
 
+func Quat_Identity() (q Quat) {
+	q.Vec4.W = 1
+	return
+}
+
 //	Quaternion
 type Quat struct {
 	//	X, Y, Z, W

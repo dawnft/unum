@@ -35,7 +35,7 @@ func Clamp01(v float64) float64 {
 	return Clamp(v, 0, 1)
 }
 
-//	Returns `v` if it is a power-of-two, or else the next-highest power-of-two.
+//	Returns `v` if it is a power-of-two, or else the closest power-of-two.
 func ClosestPowerOfTwo(v uint32) uint32 {
 	next := NextPowerOfTwo(v)
 	if prev := next / 2; (v - prev) < (next - v) {
@@ -67,7 +67,7 @@ func InverseLerp(from, to, val float64) float64 {
 }
 
 //	Returns whether `x` is a power-of-two.
-func IsPowerOfTwo(x int) bool {
+func IsPowerOfTwo(x uint32) bool {
 	return x == (x & ^(x & (x - 1)))
 }
 
@@ -134,14 +134,6 @@ func SmoothStep(from, to, t float64) float64 {
 func SmootherStep(from, to, t float64) float64 {
 	t = Clamp01((t - from) / (to - from))
 	return t * t * t * (t*(t*6-15) + 10)
-}
-
-//	Returns 0 if `x` less-than `edge`, otherwise returns 1.
-func Step(edge, x float64) (step int) {
-	if edge >= x {
-		step = 1
-	}
-	return
 }
 
 func strf(format string, args ...interface{}) string {

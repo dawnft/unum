@@ -44,7 +44,7 @@ Clamps `v` between 0 and 1.
 ```go
 func ClosestPowerOfTwo(v uint32) uint32
 ```
-Returns `v` if it is a power-of-two, or else the next-highest power-of-two.
+Returns `v` if it is a power-of-two, or else the closest power-of-two.
 
 #### func  DegToRad
 
@@ -77,7 +77,7 @@ Calculates the Lerp parameter between of two values.
 #### func  IsPowerOfTwo
 
 ```go
-func IsPowerOfTwo(x int) bool
+func IsPowerOfTwo(x uint32) bool
 ```
 Returns whether `x` is a power-of-two.
 
@@ -161,13 +161,6 @@ Interpolates between `from` and `to` with smoothing at the limits.
 func SmootherStep(from, to, t float64) float64
 ```
 Interpolates between `from` and `to` with smoother smoothing at the limits.
-
-#### func  Step
-
-```go
-func Step(edge, x float64) (step int)
-```
-Returns 0 if `x` less-than `edge`, otherwise returns 1.
 
 #### type Mat3
 
@@ -518,6 +511,12 @@ Quaternion
 
 ```go
 func NewQuat(x, y, z, w float64) *Quat
+```
+
+#### func  Quat_Identity
+
+```go
+func Quat_Identity() (q Quat)
 ```
 
 #### func (*Quat) AngleDeg
@@ -1331,13 +1330,6 @@ func (me *Vec3) SetFromSin(vec *Vec3)
 Sets each vector component in `me` to the `math.Sin` of the respective
 corresponding component in `vec`.
 
-#### func (*Vec3) SetFromStep
-
-```go
-func (me *Vec3) SetFromStep(edge float64, vec, v0, v1 *Vec3)
-```
-Component-wise, set `me` to `v0` if vec is less than `edge`, else `v1`.
-
 #### func (*Vec3) SetFromSub
 
 ```go
@@ -1581,6 +1573,13 @@ Returns the 4D vector magnitude of `me`.
 func (me *Vec4) MoveTowards(target *Vec4, maxDistanceDelta float64) *Vec4
 ```
 
+#### func (*Vec4) MultMat4
+
+```go
+func (me *Vec4) MultMat4(mat *Mat4)
+```
+Sets `me` to the result of multiplying the specified `*Mat4` with `me`.
+
 #### func (*Vec4) MultMat4Vec3
 
 ```go
@@ -1589,10 +1588,10 @@ func (me *Vec4) MultMat4Vec3(mat *Mat4, vec *Vec3)
 Sets `me` to the result of multiplying the specified `*Mat4` with the specified
 `*Vec3`.
 
-#### func (*Vec4) Mult_Mat4Vec4
+#### func (*Vec4) MultMat4Vec4
 
 ```go
-func (me *Vec4) Mult_Mat4Vec4(mat *Mat4, vec *Vec4)
+func (me *Vec4) MultMat4Vec4(mat *Mat4, vec *Vec4)
 ```
 Sets `me` to the result of multiplying the specified `*Mat4` with the specified
 `*Vec4`.
@@ -1678,13 +1677,6 @@ func (me *Vec4) SetFromMult3(q *Vec4, v *Vec3)
 ```
 Applies various 4D vector component computations of `q` and `v` to `me`, as
 needed by the `Vec3.RotateRad` method.
-
-#### func (*Vec4) SetFromMult_Mat4
-
-```go
-func (me *Vec4) SetFromMult_Mat4(mat *Mat4)
-```
-Sets `me` to the result of multiplying the specified `*Mat4` with `me`.
 
 #### func (*Vec4) SetFromVec3
 

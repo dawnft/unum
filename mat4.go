@@ -121,7 +121,7 @@ func (me *Mat4) Perspective(fovYDeg, a, n, f float64) (fovYRadHalf float64) {
 
 /*
 func (me *Mat4) Rotation (rad float64, axes *Vec3) {
-	var cos, sin = math.Cos(rad), math.Sin(rad)
+	sin, cos := math.Sincos(rad)
 	var x, y, z = axes.X, axes.Y, axes.Z
 	var xx, yy, zz, xy, xz, yz = x * x, y * y, z * z, x * y, x * z, y * z
 	me[0], me[4], me[8], me[12] = (xx + (1 - xx) * cos),		(xy * (1 - cos) - z * sin),	(xz * (1 - cos) + y * sin),	0
@@ -133,7 +133,7 @@ func (me *Mat4) Rotation (rad float64, axes *Vec3) {
 
 //	Sets `me` to a rotation matrix representing "rotate `rad` radians around the X axis".
 func (me *Mat4) RotationX(rad float64) {
-	cos, sin := math.Cos(rad), math.Sin(rad)
+	sin, cos := math.Sincos(rad)
 	me[0], me[4], me[8], me[12] = 1, 0, 0, 0
 	me[1], me[5], me[9], me[13] = 0, cos, -sin, 0
 	me[2], me[6], me[10], me[14] = 0, sin, cos, 0
@@ -142,7 +142,7 @@ func (me *Mat4) RotationX(rad float64) {
 
 //	Sets `me` to a rotation matrix representing "rotate `rad` radians around the Y axis".
 func (me *Mat4) RotationY(rad float64) {
-	cos, sin := math.Cos(rad), math.Sin(rad)
+	sin, cos := math.Sincos(rad)
 	me[0], me[4], me[8], me[12] = cos, 0, sin, 0
 	me[1], me[5], me[9], me[13] = 0, 1, 0, 0
 	me[2], me[6], me[10], me[14] = -sin, 0, cos, 0
@@ -151,7 +151,7 @@ func (me *Mat4) RotationY(rad float64) {
 
 //	Sets `me` to a rotation matrix representing "rotate `rad` radians around the Z axis".
 func (me *Mat4) RotationZ(rad float64) {
-	cos, sin := math.Cos(rad), math.Sin(rad)
+	sin, cos := math.Sincos(rad)
 	me[0], me[4], me[8], me[12] = cos, -sin, 0, 0
 	me[1], me[5], me[9], me[13] = sin, cos, 0, 0
 	me[2], me[6], me[10], me[14] = 0, 0, 1, 0
