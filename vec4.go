@@ -6,11 +6,7 @@ import (
 
 //	Represents an arbitrary 4-dimensional vector or a Quaternion.
 type Vec4 struct {
-	//	X, Y, Z
-	Vec3
-
-	//	The 4th vector component.
-	W float64
+	X, Y, Z, W float64
 }
 
 //	Returns a new `*Vec4` containing a copy of `me`.
@@ -111,6 +107,10 @@ func (me *Vec4) SetFromMult3(q *Vec4, v *Vec3) {
 //	Sets `me` to the result of multiplying the specified `*Mat4` with `me`.
 func (me *Vec4) SetFromMultMat4(mat *Mat4) {
 	me.MultMat4Vec4(mat, me.Clone())
+}
+
+func (me *Vec4) Set3(vec *Vec3) {
+	me.X, me.Y, me.Z = vec.X, vec.Y, vec.Z
 }
 
 //	Returns a human-readable (imprecise) `string` representation of `me`.

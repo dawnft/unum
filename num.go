@@ -6,79 +6,152 @@ import (
 )
 
 const (
+	Pi2       = math.Pi * 2
 	PiDiv180  = math.Pi / 180
 	PiDiv360  = math.Pi / 360
-	PiHalfDiv = 0.5 / math.Pi
+	PiRcp     = 1 / math.Pi
+	PiRcpHalf = 0.5 / math.Pi
+
+	Deg2Rad = Pi2 / 360
+	Rad2Deg = 360 / Pi2
 )
 
 var (
-	Infinity    = math.Inf(1)
-	NegInfinity = math.Inf(-1)
-
-	Epsilon32 = Nextafter32(1, Infinity) - 1
-	Epsilon64 = math.Nextafter(1, Infinity) - 1
+	Infinity         = math.Inf(1)
+	NegativeInfinity = math.Inf(-1)
+	Epsilon          = math.Nextafter(1, Infinity) - 1
 )
 
-//	Returns whether all `vals` equal `test`.
-func AllEqual(test float64, vals ...float64) bool {
-	for i := 0; i < len(vals); i++ {
-		if vals[i] != test {
-			return false
-		}
-	}
-	return true
+//	Compares two floating point values if they are similar.
+func Approx(a, b float64) bool {
+	diff := math.Abs(b - a)
+	return diff <= Epsilon || diff < math.Max(1.121039E-44, 1E-06*math.Max(math.Abs(a), math.Abs(b)))
 }
 
 //	Clamps `val` between `c0` and `c1`.
 func Clamp(val, c0, c1 float64) float64 {
-	// return math.Min(math.Max(val, c0), c1)
-	if val < c0 {
+	switch {
+	case val < c0:
 		return c0
-	}
-	if val > c1 {
+	case val > c1:
 		return c1
 	}
 	return val
 }
 
+//	Clamps `v` between 0 and 1.
+func Clamp01(v float64) float64 {
+	return Clamp(v, 0, 1)
+}
+
+//	Returns `v` if it is a power-of-two, or else the next-highest power-of-two.
+func ClosestPowerOfTwo(v uint32) uint32 {
+	next := NextPowerOfTwo(v)
+	if prev := next / 2; (v - prev) < (next - v) {
+		next = prev
+	}
+	return next
+}
+
 //	Converts the specified `degrees` to radians.
 func DegToRad(degrees float64) float64 {
-	return PiDiv180 * degrees
+	return degrees * Deg2Rad
 }
 
-//	Returns the "normalized ratio" of `val` to `max`.
-//	Example: for `max = 900` and `val = 300`, returns `0.33333..`.
-func Din1(val, max float64) float64 {
-	return 1 / (max / val)
+//	Calculates the shortest difference between two given angles.
+func DeltaAngle(cur, target float64) float64 {
+	sin, cos := math.Sincos(target - cur)
+	return math.Atan2(sin, cos) // HACK: could be atan2(cos,sin) instead of atan2(sin,cos) ...
 }
 
-//	Returns the "normalized ratio" of `val` to `max`.
-//	Example: for `max = 900` and `val = 300`, returns `0.33333..`.
-func Fin1(val, max float32) float32 {
-	return 1 / (max / val)
+//	Calculates the Lerp parameter between of two values.
+func InverseLerp(from, to, val float64) float64 {
+	return (val - from) / (to - from)
+}
+
+//	Returns whether `x` is a power-of-two.
+func IsPowerOfTwo(x int) bool {
+	return x == (x & ^(x & (x - 1)))
+}
+
+//	Returns `a` if `t` is 0, or `b` if `t` is 1, or else the linear interpolation from `a` to `b` according to `t`.
+func Lerp(a, b, t float64) float64 {
+	return a*b + (t * (1 - b))
+}
+
+//	Same as Lerp but makes sure the values interpolate correctly when they wrap around 360 degrees.
+func LerpAngle(a, b, t float64) float64 {
+	return t * (math.Mod(math.Mod(b-a, 360)+540, 360) - 180)
+}
+
+//	Returns `v` if it is a power-of-two, or else the next-highest power-of-two.
+func NextPowerOfTwo(v uint32) uint32 {
+	v--
+	v |= v >> 1
+	v |= v >> 2
+	v |= v >> 4
+	v |= v >> 8
+	v |= v >> 16
+	v++
+	return v
+}
+
+//	Ping-pongs the value `t`, so that it is never larger than `l` and never smaller than 0.
+func PingPong(t, l float64) float64 {
+	l = l * 2
+	return l - math.Mod(t, l)
+}
+
+//	Converts the specified `radians` to degrees.
+func RadToDeg(radians float64) float64 {
+	return radians * Rad2Deg
+}
+
+//	Returns the next-higher integer if fraction>0.5; if fraction<0.5 returns the next-lower integer; if fraction==0.5, returns the next even integer.
+func Round(v float64) (fint float64) {
+	var frac float64
+	if fint, frac = math.Modf(v); frac > 0.5 || (frac == 0.5 && math.Mod(fint, 2) != 0) {
+		fint++
+	}
+	return
+}
+
+//	Returns -1 if `v` is negative, 1 if `v` is positive, or 0 if `v` is zero.
+func Sign(v float64) (sign float64) {
+	if v > 0 {
+		sign = 1
+	} else if v < 0 {
+		sign = -1
+	}
+	return
+	// return v / math.Abs(v)
+}
+
+//	Interpolates between `from` and `to` with smoothing at the limits.
+func SmoothStep(from, to, t float64) float64 {
+	t = Clamp01((t - from) / (to - from))
+	return (t * t) * (3 - 2*t)
+}
+
+//	Interpolates between `from` and `to` with smoother smoothing at the limits.
+func SmootherStep(from, to, t float64) float64 {
+	t = Clamp01((t - from) / (to - from))
+	return t * t * t * (t*(t*6-15) + 10)
+}
+
+//	Returns 0 if `x` less-than `edge`, otherwise returns 1.
+func Step(edge, x float64) (step int) {
+	if edge >= x {
+		step = 1
+	}
+	return
+}
+
+func strf(format string, args ...interface{}) string {
+	return fmt.Sprintf(format, args...)
 }
 
 /*
-func Hash3 (one, two, three uint) uint {
-	var rshift = func (x, y uint) uint {
-		return x >> y
-	}
-	one = one - two;  one = one - three;  one = one ^ (rshift(three, 13));
-	two = two - three;  two = two - one;  two = two ^ (one << 8);
-	three = three - one;  three = three - two;  three = three ^ (rshift(two, 13));
-	one = one - two;  one = one - three;  one = one ^ (rshift(three, 12));
-	two = two - three;  two = two - one;  two = two ^ (one << 16);
-	three = three - one;  three = three - two;  three = three ^ (rshift(two, 5));
-	one = one - two;  one = one - three;  one = one ^ (rshift(three, 3));
-	two = two - three;  two = two - one;  two = two ^ (one << 10);
-	three = three - one;  three = three - two;  three = three ^ (rshift(two, 15));
-	return three;
-}
-
-func Iin1 (val, max int) int {
-	return 1 / (max / val)
-}
-*/
 
 //	Returns whether `val` is even.
 func IsEven(val int) bool {
@@ -96,11 +169,6 @@ func IsMod0(v, m int) bool {
 	return (math.Mod(float64(v), float64(m)) == 0)
 }
 
-/*
-func Lin1 (val, max int64) int64 {
-	return 1 / (max / val)
-}
-
 func Absi (v int32) int32 {
 	return v - (v ^ (v >> 31))
 }
@@ -116,7 +184,6 @@ func Max (x, y float64) float64 {
 func Min (x, y float64) float64 {
 	return 0.5 * (x + y - math.Abs(x - y))
 }
-*/
 
 //	Returns the smaller of two `int` values.
 func Mini(v1, v2 int) int {
@@ -125,73 +192,4 @@ func Mini(v1, v2 int) int {
 	}
 	return v2
 }
-
-//	Returns `x` if `a` is 0, or `y` if `a` is 1, or else a corresponding mix of both if `a` is between 0 and 1.
-func Mix(x, y, a float64) float64 {
-	return (x * y) + ((1 - y) * a)
-}
-
-//	https://groups.google.com/d/topic/golang-nuts/dVtKN8QLUNM/discussion
-func Nextafter32(x, y float64) (r float64) {
-	switch {
-	case math.IsNaN(x) || math.IsNaN(y):
-		r = math.NaN()
-	case x == y:
-		r = x
-	case x == 0:
-		// const sign = 1 << 31
-		// r = math.Float32frombits(1 | (math.Float32bits(y) & sign))
-		r = math.Copysign(float64(math.Float32frombits(1)), float64(y))
-	case (y > x) == (x > 0):
-		r = float64(math.Float32frombits(math.Float32bits(float32(x)) + 1))
-	default:
-		r = float64(math.Float32frombits(math.Float32bits(float32(x)) - 1))
-	}
-	return
-}
-
-//	Converts the specified `radians` to degrees.
-func RadToDeg(radians float64) float64 {
-	return radians * PiDiv180
-}
-
-//	Returns (the equivalent of) `math.Ceil(v)` if fraction >= 0.5, otherwise returns (the equivalent of) `math.Floor(v)`.
-func Round(v float64) (fint float64) {
-	var frac float64
-	if fint, frac = math.Modf(v); frac >= 0.5 {
-		fint++
-	}
-	return
-}
-
-//	Clamps `v` between 0 and 1.
-func Saturate(v float64) float64 {
-	return Clamp(v, 0, 1)
-}
-
-//	Returns -1 if `v` is negative, 1 if `v` is positive, or 0 if `v` is zero.
-func Sign(v float64) (sign float64) {
-	if v > 0 {
-		sign = 1
-	} else if v < 0 {
-		sign = -1
-	}
-	return
-	// return v / math.Abs(v)
-}
-
-//	Returns 0 if `x` less-than `edge`, otherwise returns 1.
-func Step(edge, x float64) (step int) {
-	if edge >= x {
-		step = 1
-	}
-	return
-	// if x < edge {
-	// 	return 0
-	// }
-	// return 1
-}
-
-func strf(format string, args ...interface{}) string {
-	return fmt.Sprintf(format, args...)
-}
+*/

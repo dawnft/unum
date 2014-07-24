@@ -9,28 +9,31 @@ quaternions.
 
 ```go
 const (
+	Pi2       = math.Pi * 2
 	PiDiv180  = math.Pi / 180
 	PiDiv360  = math.Pi / 360
-	PiHalfDiv = 0.5 / math.Pi
+	PiRcp     = 1 / math.Pi
+	PiRcpHalf = 0.5 / math.Pi
+
+	Deg2Rad = Pi2 / 360
+	Rad2Deg = 360 / Pi2
 )
 ```
 
 ```go
 var (
-	Infinity    = math.Inf(1)
-	NegInfinity = math.Inf(-1)
-
-	Epsilon32 = Nextafter32(1, Infinity) - 1
-	Epsilon64 = math.Nextafter(1, Infinity) - 1
+	Infinity         = math.Inf(1)
+	NegativeInfinity = math.Inf(-1)
+	Epsilon          = math.Nextafter(1, Infinity) - 1
 )
 ```
 
-#### func  AllEqual
+#### func  Approx
 
 ```go
-func AllEqual(test float64, vals ...float64) bool
+func Approx(a, b float64) bool
 ```
-Returns whether all `vals` equal `test`.
+Compares two floating point values if they are similar.
 
 #### func  Clamp
 
@@ -39,6 +42,20 @@ func Clamp(val, c0, c1 float64) float64
 ```
 Clamps `val` between `c0` and `c1`.
 
+#### func  Clamp01
+
+```go
+func Clamp01(v float64) float64
+```
+Clamps `v` between 0 and 1.
+
+#### func  ClosestPowerOfTwo
+
+```go
+func ClosestPowerOfTwo(v uint32) uint32
+```
+Returns `v` if it is a power-of-two, or else the next-highest power-of-two.
+
 #### func  DegToRad
 
 ```go
@@ -46,42 +63,42 @@ func DegToRad(degrees float64) float64
 ```
 Converts the specified `degrees` to radians.
 
-#### func  Din1
+#### func  DeltaAngle
 
 ```go
-func Din1(val, max float64) float64
+func DeltaAngle(cur, target float64) float64
 ```
-Returns the "normalized ratio" of `val` to `max`. Example: for `max = 900` and
-`val = 300`, returns `0.33333..`.
+Calculates the shortest difference between two given angles.
 
-#### func  Fin1
+#### func  InverseLerp
 
 ```go
-func Fin1(val, max float32) float32
+func InverseLerp(from, to, val float64) float64
 ```
-Returns the "normalized ratio" of `val` to `max`. Example: for `max = 900` and
-`val = 300`, returns `0.33333..`.
+Calculates the Lerp parameter between of two values.
 
-#### func  IsEven
+#### func  IsPowerOfTwo
 
 ```go
-func IsEven(val int) bool
+func IsPowerOfTwo(x int) bool
 ```
-Returns whether `val` is even.
+Returns whether `x` is a power-of-two.
 
-#### func  IsInt
+#### func  Lerp
 
 ```go
-func IsInt(val float64) bool
+func Lerp(a, b, t float64) float64
 ```
-Returns whether `val` represents an integer.
+Returns `a` if `t` is 0, or `b` if `t` is 1, or else the linear interpolation
+from `a` to `b` according to `t`.
 
-#### func  IsMod0
+#### func  LerpAngle
 
 ```go
-func IsMod0(v, m int) bool
+func LerpAngle(a, b, t float64) float64
 ```
-Returns whether `math.Mod(v, m)` is 0.
+Same as Lerp but makes sure the values interpolate correctly when they wrap
+around 360 degrees.
 
 #### func  Mat3Identities
 
@@ -97,27 +114,20 @@ func Mat4Identities(mats ...*Mat4)
 ```
 Calls the `Identity` method on all specified `mats`.
 
-#### func  Mini
+#### func  NextPowerOfTwo
 
 ```go
-func Mini(v1, v2 int) int
+func NextPowerOfTwo(v uint32) uint32
 ```
-Returns the smaller of two `int` values.
+Returns `v` if it is a power-of-two, or else the next-highest power-of-two.
 
-#### func  Mix
+#### func  PingPong
 
 ```go
-func Mix(x, y, a float64) float64
+func PingPong(t, l float64) float64
 ```
-Returns `x` if `a` is 0, or `y` if `a` is 1, or else a corresponding mix of both
-if `a` is between 0 and 1.
-
-#### func  Nextafter32
-
-```go
-func Nextafter32(x, y float64) (r float64)
-```
-https://groups.google.com/d/topic/golang-nuts/dVtKN8QLUNM/discussion
+Ping-pongs the value `t`, so that it is never larger than `l` and never smaller
+than 0.
 
 #### func  RadToDeg
 
@@ -131,15 +141,8 @@ Converts the specified `radians` to degrees.
 ```go
 func Round(v float64) (fint float64)
 ```
-Returns (the equivalent of) `math.Ceil(v)` if fraction >= 0.5, otherwise returns
-(the equivalent of) `math.Floor(v)`.
-
-#### func  Saturate
-
-```go
-func Saturate(v float64) float64
-```
-Clamps `v` between 0 and 1.
+Returns the next-higher integer if fraction>0.5; if fraction<0.5 returns the
+next-lower integer; if fraction==0.5, returns the next even integer.
 
 #### func  Sign
 
@@ -147,6 +150,20 @@ Clamps `v` between 0 and 1.
 func Sign(v float64) (sign float64)
 ```
 Returns -1 if `v` is negative, 1 if `v` is positive, or 0 if `v` is zero.
+
+#### func  SmoothStep
+
+```go
+func SmoothStep(from, to, t float64) float64
+```
+Interpolates between `from` and `to` with smoothing at the limits.
+
+#### func  SmootherStep
+
+```go
+func SmootherStep(from, to, t float64) float64
+```
+Interpolates between `from` and `to` with smoother smoothing at the limits.
 
 #### func  Step
 
@@ -497,12 +514,103 @@ type Vec2 struct{ X, Y float64 }
 
 A 2-dimensional vector.
 
+#### func  Vec2_Lerp
+
+```go
+func Vec2_Lerp(from, to *Vec2, t float64) *Vec2
+```
+
+#### func  Vec2_Max
+
+```go
+func Vec2_Max(lhs, rhs *Vec2) *Vec2
+```
+
+#### func  Vec2_Min
+
+```go
+func Vec2_Min(lhs, rhs *Vec2) *Vec2
+```
+
+#### func  Vec2_One
+
+```go
+func Vec2_One() Vec2
+```
+Vec2{1, 1}
+
+#### func  Vec2_Right
+
+```go
+func Vec2_Right() Vec2
+```
+Vec2{1, 0}
+
+#### func  Vec2_Up
+
+```go
+func Vec2_Up() Vec2
+```
+Vec2{0, 1}
+
+#### func  Vec2_Zero
+
+```go
+func Vec2_Zero() Vec2
+```
+Vec2{0, 0}
+
+#### func (*Vec2) Add
+
+```go
+func (me *Vec2) Add(vec *Vec2)
+```
+
+#### func (*Vec2) AddedDiv
+
+```go
+func (me *Vec2) AddedDiv(a *Vec2, d float64) *Vec2
+```
+
+#### func (*Vec2) AngleDeg
+
+```go
+func (me *Vec2) AngleDeg(to *Vec2) float64
+```
+
+#### func (*Vec2) AngleRad
+
+```go
+func (me *Vec2) AngleRad(to *Vec2) float64
+```
+
+#### func (*Vec2) ClampMagnitude
+
+```go
+func (me *Vec2) ClampMagnitude(maxLength float64) *Vec2
+```
+
+#### func (*Vec2) Distance
+
+```go
+func (me *Vec2) Distance(vec *Vec2) float64
+```
+
 #### func (*Vec2) Div
 
 ```go
 func (me *Vec2) Div(vec *Vec2) *Vec2
 ```
-Returns a new `*Vec2` that is the result of dividing `me` by `vec`.
+Returns a new `*Vec2` that is the result of dividing `me` by `vec` without
+checking for division-by-0.
+
+#### func (*Vec2) DivSafe
+
+```go
+func (me *Vec2) DivSafe(vec *Vec2) *Vec2
+```
+Returns a new `*Vec2` that is the result of dividing `me` by `vec`, safely
+checking for division-by-0.
 
 #### func (*Vec2) Dot
 
@@ -510,6 +618,12 @@ Returns a new `*Vec2` that is the result of dividing `me` by `vec`.
 func (me *Vec2) Dot(vec *Vec2) float64
 ```
 Returns the dot product of `me` and `vec`.
+
+#### func (*Vec2) Eq
+
+```go
+func (me *Vec2) Eq(vec *Vec2) bool
+```
 
 #### func (*Vec2) Length
 
@@ -525,6 +639,12 @@ func (me *Vec2) Magnitude() float64
 ```
 Returns the 2D vector magnitude of `me`.
 
+#### func (*Vec2) MoveTowards
+
+```go
+func (me *Vec2) MoveTowards(target *Vec2, maxDistanceDelta float64) *Vec2
+```
+
 #### func (*Vec2) Mult
 
 ```go
@@ -532,27 +652,57 @@ func (me *Vec2) Mult(vec *Vec2) *Vec2
 ```
 Returns a new `*Vec2` that is the result of multiplying `me` with `vec`.
 
+#### func (*Vec2) Negate
+
+```go
+func (me *Vec2) Negate() *Vec2
+```
+
 #### func (*Vec2) Normalize
 
 ```go
 func (me *Vec2) Normalize()
 ```
-Normalizes `me` in-place.
+Normalizes `me` in-place without checking for division-by-0.
+
+#### func (*Vec2) NormalizeSafe
+
+```go
+func (me *Vec2) NormalizeSafe()
+```
+Normalizes `me` in-place, safely checking for division-by-0.
 
 #### func (*Vec2) Normalized
 
 ```go
 func (me *Vec2) Normalized() *Vec2
 ```
-Returns a new `*Vec2` that is the normalized representation of `me`.
+Returns a new `*Vec2` that is the normalized representation of `me` without
+checking for division-by-0.
+
+#### func (*Vec2) NormalizedSafe
+
+```go
+func (me *Vec2) NormalizedSafe() *Vec2
+```
+Returns a new `*Vec2` that is the normalized representation of `me`, safely
+checking for division-by-0.
 
 #### func (*Vec2) NormalizedScaled
 
 ```go
-func (me *Vec2) NormalizedScaled(factor float64) (vec *Vec2)
+func (me *Vec2) NormalizedScaled(factor float64) *Vec2
 ```
 Returns a new `*Vec2` that is the normalized representation of `me` scaled by
-`factor`.
+`factor` without checking for division-by-0.
+
+#### func (*Vec2) NormalizedScaledSafe
+
+```go
+func (me *Vec2) NormalizedScaledSafe(factor float64) *Vec2
+```
+Returns a new `*Vec2` that is the normalized representation of `me` scaled by
+`factor`, safely checking for division-by-0.
 
 #### func (*Vec2) Scale
 
@@ -568,6 +718,19 @@ func (me *Vec2) Scaled(factor float64) *Vec2
 ```
 Returns a new `*Vec2` that represents `me` scaled by `factor`.
 
+#### func (*Vec2) Set
+
+```go
+func (me *Vec2) Set(x, y float64)
+```
+
+#### func (*Vec2) SqrMagnitude
+
+```go
+func (me *Vec2) SqrMagnitude() float64
+```
+Alias for `me.Length()`
+
 #### func (*Vec2) String
 
 ```go
@@ -575,10 +738,17 @@ func (me *Vec2) String() string
 ```
 Returns a human-readable (imprecise) `string` representation of `me`.
 
-#### func (*Vec2) Sub
+#### func (*Vec2) Subtract
 
 ```go
-func (me *Vec2) Sub(vec *Vec2) *Vec2
+func (me *Vec2) Subtract(vec *Vec2)
+```
+Subtracts `vec` from `me`.
+
+#### func (*Vec2) Subtracted
+
+```go
+func (me *Vec2) Subtracted(vec *Vec2) *Vec2
 ```
 Returns a new `*Vec2` that represents `me` minus `vec`.
 
@@ -592,12 +762,53 @@ type Vec3 struct {
 
 Represents a 3-dimensional vector.
 
-#### func (*Vec3) AbsMax
+#### func  Vec3_Back
 
 ```go
-func (me *Vec3) AbsMax() float64
+func Vec3_Back() Vec3
 ```
-Returns the `math.Max` of the `math.Abs` values of all 3 components in `me`.
+
+#### func  Vec3_Down
+
+```go
+func Vec3_Down() Vec3
+```
+
+#### func  Vec3_Fwd
+
+```go
+func Vec3_Fwd() Vec3
+```
+
+#### func  Vec3_Left
+
+```go
+func Vec3_Left() Vec3
+```
+
+#### func  Vec3_One
+
+```go
+func Vec3_One() Vec3
+```
+
+#### func  Vec3_Right
+
+```go
+func Vec3_Right() Vec3
+```
+
+#### func  Vec3_Up
+
+```go
+func Vec3_Up() Vec3
+```
+
+#### func  Vec3_Zero
+
+```go
+func Vec3_Zero() Vec3
+```
 
 #### func (*Vec3) Add
 
@@ -620,51 +831,55 @@ func (me *Vec3) Add3(x, y, z float64)
 ```
 Adds the specified 3 components to the respective components in `me`.
 
-#### func (*Vec3) AddTo
+#### func (*Vec3) Added
 
 ```go
-func (me *Vec3) AddTo(vec *Vec3) *Vec3
+func (me *Vec3) Added(vec *Vec3) *Vec3
 ```
 Returns the sum of `me` and `vec`.
 
-#### func (*Vec3) AllEqual
+#### func (*Vec3) AllEq
 
 ```go
-func (me *Vec3) AllEqual(val float64) bool
+func (me *Vec3) AllEq(val float64) bool
 ```
 Returns whether all 3 components in `me` equal `val`.
 
-#### func (*Vec3) AllGreaterOrEqual
+#### func (*Vec3) AllGEq
 
 ```go
-func (me *Vec3) AllGreaterOrEqual(vec *Vec3) bool
+func (me *Vec3) AllGEq(vec *Vec3) bool
 ```
 Returns whether all 3 components in `me` are greater than or equal to their
 respective component counterparts in `vec`.
 
-#### func (*Vec3) AllInRange
+#### func (*Vec3) AllIn
 
 ```go
-func (me *Vec3) AllInRange(min, max float64) bool
-```
-Returns whether all 3 components in `me` are greater than (or equal to) `min`,
-and also less than `max`.
-
-#### func (*Vec3) AllInside
-
-```go
-func (me *Vec3) AllInside(min, max *Vec3) bool
+func (me *Vec3) AllIn(min, max *Vec3) bool
 ```
 Returns whether all 3 components in `me` are greater than `min`, and also less
 than `max`.
 
-#### func (*Vec3) AllLessOrEqual
+#### func (*Vec3) AllLEq
 
 ```go
-func (me *Vec3) AllLessOrEqual(vec *Vec3) bool
+func (me *Vec3) AllLEq(vec *Vec3) bool
 ```
 Returns whether all 3 components in `me` are less than their respective
 component counterparts in `vec`.
+
+#### func (*Vec3) AngleDeg
+
+```go
+func (me *Vec3) AngleDeg(to *Vec3) float64
+```
+
+#### func (*Vec3) AngleRad
+
+```go
+func (me *Vec3) AngleRad(to *Vec3) float64
+```
 
 #### func (*Vec3) Clamp
 
@@ -673,6 +888,19 @@ func (me *Vec3) Clamp(min, max *Vec3)
 ```
 Clamps each component in `me` between the respective corresponding counter-part
 component in `min` and `max`.
+
+#### func (*Vec3) Clamp01
+
+```go
+func (me *Vec3) Clamp01()
+```
+Clamps each component in `me` between 0 and 1.
+
+#### func (*Vec3) ClampMagnitude
+
+```go
+func (me *Vec3) ClampMagnitude(maxLength float64) *Vec3
+```
 
 #### func (*Vec3) Clear
 
@@ -696,19 +924,19 @@ func (me *Vec3) CrossNormalized(vec *Vec3) (r *Vec3)
 Returns a new `*Vec` that represents the cross-product of `me` and `vec`,
 normalized.
 
-#### func (*Vec3) DistanceFrom
+#### func (*Vec3) Distance
 
 ```go
-func (me *Vec3) DistanceFrom(vec *Vec3) float64
+func (me *Vec3) Distance(vec *Vec3) float64
 ```
 Returns the distance of `me` from `vec`.
 
-#### func (*Vec3) DistanceFromZero
+#### func (*Vec3) DistanceManhattan
 
 ```go
-func (me *Vec3) DistanceFromZero() float64
+func (me *Vec3) DistanceManhattan(vec *Vec3) float64
 ```
-Returns the distance of `me` from "the center" (zero).
+Returns the "manhattan distance" of `me` from `vec`.
 
 #### func (*Vec3) Div
 
@@ -739,12 +967,11 @@ func (me *Vec3) DotSub(vec1, vec2 *Vec3) float64
 ```
 Returns the dot-product of `me` and (`vec1` minus `vec2`).
 
-#### func (*Vec3) Inv
+#### func (*Vec3) Eq
 
 ```go
-func (me *Vec3) Inv() *Vec3
+func (me *Vec3) Eq(vec *Vec3) bool
 ```
-Returns a new `*Vec3` representing the inverse of `me`.
 
 #### func (*Vec3) Length
 
@@ -760,27 +987,19 @@ func (me *Vec3) Magnitude() float64
 ```
 Returns the 3D vector magnitude of `me`.
 
-#### func (*Vec3) MakeFinite
-
-```go
-func (me *Vec3) MakeFinite(vec *Vec3)
-```
-Sets each component in `me` to the corresponding component in `vec` only if the
-former is infinity.
-
-#### func (*Vec3) ManhattanDistanceFrom
-
-```go
-func (me *Vec3) ManhattanDistanceFrom(vec *Vec3) float64
-```
-Returns the "manhattan distance" of `me` from `vec`.
-
 #### func (*Vec3) Max
 
 ```go
 func (me *Vec3) Max() float64
 ```
 Returns the largest of the 3 components in `me`.
+
+#### func (*Vec3) MaxAbs
+
+```go
+func (me *Vec3) MaxAbs() float64
+```
+Returns the `math.Max` of the `math.Abs` values of all 3 components in `me`.
 
 #### func (*Vec3) Min
 
@@ -795,6 +1014,14 @@ Returns the smallest of the 3 components in `me`.
 func (me *Vec3) Mult(vec *Vec3) *Vec3
 ```
 Returns a new `*Vec3` that represents `me` multiplied with `vec`.
+
+#### func (*Vec3) Mult3
+
+```go
+func (me *Vec3) Mult3(x, y, z float64) *Vec3
+```
+Returns a new `*Vec3` with each component in `me` multiplied by the respective
+corresponding specified factor.
 
 #### func (*Vec3) Negate
 
@@ -816,12 +1043,19 @@ inverted) corresponding component in `me`.
 ```go
 func (me *Vec3) Normalize()
 ```
-Normalizes `me` in-place.
+Normalizes `me` in-place without checking for division-by-0.
+
+#### func (*Vec3) NormalizeSafe
+
+```go
+func (me *Vec3) NormalizeSafe()
+```
+Normalizes `me` in-place, safely checking for division-by-0.
 
 #### func (*Vec3) Normalized
 
 ```go
-func (me *Vec3) Normalized() (vec *Vec3)
+func (me *Vec3) Normalized() *Vec3
 ```
 Returns a new `*Vec3` that represents `me`, normalized.
 
@@ -831,6 +1065,13 @@ Returns a new `*Vec3` that represents `me`, normalized.
 func (me *Vec3) NormalizedScaled(factor float64) (vec *Vec3)
 ```
 Returns a new `*Vec3` that represents `me` normalized, then scaled by `factor`.
+
+#### func (*Vec3) Rcp
+
+```go
+func (me *Vec3) Rcp() *Vec3
+```
+Returns a new `*Vec3` representing `1/me`.
 
 #### func (*Vec3) RotateDeg
 
@@ -896,19 +1137,12 @@ func (me *Vec3) SetFromAddAdd(a, b, c *Vec3)
 ```
 `me = a + b + c`
 
-#### func (*Vec3) SetFromAddMult
-
-```go
-func (me *Vec3) SetFromAddMult(add, mul1, mul2 *Vec3)
-```
-`me = add + (mul1 * mul2)`
-
 #### func (*Vec3) SetFromAddScaled
 
 ```go
 func (me *Vec3) SetFromAddScaled(vec1, vec2 *Vec3, mul float64)
 ```
-`me = vec2 + vec2 * mul`
+`me = mul * vec2 + vec1`
 
 #### func (*Vec3) SetFromAddSub
 
@@ -947,28 +1181,12 @@ func (me *Vec3) SetFromDegToRad(deg *Vec3)
 Sets each vector component in `me` to the radian equivalent of the degree angle
 stored in the respective corresponding component of `vec`.
 
-#### func (*Vec3) SetFromEpsilon32
+#### func (*Vec3) SetFromMad
 
 ```go
-func (me *Vec3) SetFromEpsilon32()
+func (me *Vec3) SetFromMad(mul1, mul2, add *Vec3)
 ```
-Sets each vector component in `me` to `Epsilon32` if it is 0 or greater but
-smaller than `Epsilon32`.
-
-#### func (*Vec3) SetFromEpsilon64
-
-```go
-func (me *Vec3) SetFromEpsilon64()
-```
-Sets each vector component in `me` to `Epsilon64` if it is 0 or greater but
-smaller than `Epsilon64`.
-
-#### func (*Vec3) SetFromInv
-
-```go
-func (me *Vec3) SetFromInv(vec *Vec3)
-```
-Sets `me` to the inverse of `vec`.
+`me = mul1 * mul2 + add`
 
 #### func (*Vec3) SetFromMult
 
@@ -990,6 +1208,13 @@ func (me *Vec3) SetFromNegated(vec *Vec3)
 func (me *Vec3) SetFromNormalized(vec *Vec3)
 ```
 Sets `me` to `vec` normalized.
+
+#### func (*Vec3) SetFromRcp
+
+```go
+func (me *Vec3) SetFromRcp(vec *Vec3)
+```
+Sets `me` to the inverse of `vec`.
 
 #### func (*Vec3) SetFromRotation
 
@@ -1025,7 +1250,7 @@ corresponding component in `vec`.
 ```go
 func (me *Vec3) SetFromStep(edge float64, vec, v0, v1 *Vec3)
 ```
-Component-wise, set `me` to `v0` if it is less than `edge`, else `v1`.
+Component-wise, set `me` to `v0` if vec is less than `edge`, else `v1`.
 
 #### func (*Vec3) SetFromSub
 
@@ -1105,19 +1330,12 @@ func (me *Vec3) SubDivMult(sub, div, mul *Vec3) *Vec3
 ```
 Returns a new `*Vec3` that represents `((me - sub) / div) * mul`.
 
-#### func (*Vec3) SubDot
-
-```go
-func (me *Vec3) SubDot(vec *Vec3) float64
-```
-Returns the dot-product of `me` minus `vec`.
-
 #### func (*Vec3) SubFloorDivMult
 
 ```go
-func (me *Vec3) SubFloorDivMult(floorDiv, mul float64) *Vec3
+func (me *Vec3) SubFloorDivMult(div, mul float64) *Vec3
 ```
-Returns a new `*Vec3` that represents `mul * math.Floor(me / floorDiv)`.
+Returns a new `*Vec3` that represents `mul * math.Floor(me / div)`.
 
 #### func (*Vec3) SubFrom
 
@@ -1140,14 +1358,6 @@ func (me *Vec3) SubVec(vec *Vec3)
 ```
 Subtracts `vec` from `me`.
 
-#### func (*Vec3) Times
-
-```go
-func (me *Vec3) Times(x, y, z float64) *Vec3
-```
-Returns a new `*Vec3` with each component in `me` multiplied by the respective
-corresponding specified factor.
-
 #### func (*Vec3) TransformCoord
 
 ```go
@@ -1166,11 +1376,7 @@ Transform normal vector `me` according to the specified `*Mat4`.
 
 ```go
 type Vec4 struct {
-	//	X, Y, Z
-	Vec3
-
-	//	The 4th vector component.
-	W float64
+	X, Y, Z, W float64
 }
 ```
 
@@ -1255,6 +1461,12 @@ Returns a new `*Vec4` that represents `me` normalized according to
 func (me *Vec4) Scale(v float64)
 ```
 Scales all 4 vector components in `me` by factor `v`.
+
+#### func (*Vec4) Set3
+
+```go
+func (me *Vec4) Set3(vec *Vec3)
+```
 
 #### func (*Vec4) SetFromConjugated
 
