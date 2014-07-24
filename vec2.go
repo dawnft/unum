@@ -29,12 +29,12 @@ func Vec2_Lerp(from, to *Vec2, t float64) *Vec2 {
 	return &Vec2{t*(to.X-from.X) + from.X, t*(to.Y-from.Y) + from.Y}
 }
 
-func Vec2_Max(lhs, rhs *Vec2) *Vec2 {
-	return &Vec2{math.Max(lhs.X, rhs.X), math.Max(lhs.Y, rhs.Y)}
+func Vec2_Max(l, r *Vec2) *Vec2 {
+	return &Vec2{math.Max(l.X, r.X), math.Max(l.Y, r.Y)}
 }
 
-func Vec2_Min(lhs, rhs *Vec2) *Vec2 {
-	return &Vec2{math.Min(lhs.X, rhs.X), math.Min(lhs.Y, rhs.Y)}
+func Vec2_Min(l, r *Vec2) *Vec2 {
+	return &Vec2{math.Min(l.X, r.X), math.Min(l.Y, r.Y)}
 }
 
 //	A 2-dimensional vector.
@@ -63,13 +63,25 @@ func (me *Vec2) ClampMagnitude(maxLength float64) *Vec2 {
 	return me
 }
 
+func (me *Vec2) Clear() {
+	me.X, me.Y = 0, 0
+}
+
 func (me *Vec2) Distance(vec *Vec2) float64 {
-	return me.Subtracted(vec).Magnitude()
+	return me.Sub(vec).Magnitude()
 }
 
 //	Returns a new `*Vec2` that is the result of dividing `me` by `vec` without checking for division-by-0.
 func (me *Vec2) Div(vec *Vec2) *Vec2 {
 	return &Vec2{me.X / vec.X, me.Y / vec.Y}
+}
+
+func (me *Vec2) Divide(d float64) {
+	me.X, me.Y = me.X/d, me.Y/d
+}
+
+func (me *Vec2) Divided(d float64) *Vec2 {
+	return &Vec2{me.X / d, me.Y / d}
 }
 
 //	Returns a new `*Vec2` that is the result of dividing `me` by `vec`, safely checking for division-by-0.
@@ -90,12 +102,12 @@ func (me *Vec2) Dot(vec *Vec2) float64 {
 }
 
 func (me *Vec2) Eq(vec *Vec2) bool {
-	return me.Subtracted(vec).Length() < 9.99999944E-11
+	return me.Sub(vec).Length() < EpsilonEqVec
 }
 
 //	Returns the 2D vector length of `me`.
 func (me *Vec2) Length() float64 {
-	return me.X*me.X + me.Y*me.Y
+	return me.Dot(me)
 }
 
 //	Returns the 2D vector magnitude of `me`.
@@ -104,7 +116,7 @@ func (me *Vec2) Magnitude() float64 {
 }
 
 func (me *Vec2) MoveTowards(target *Vec2, maxDistanceDelta float64) *Vec2 {
-	a := target.Subtracted(me)
+	a := target.Sub(me)
 	m := a.Magnitude()
 	if m <= maxDistanceDelta || m == 0 {
 		return target
@@ -123,47 +135,39 @@ func (me *Vec2) Negate() *Vec2 {
 
 //	Normalizes `me` in-place without checking for division-by-0.
 func (me *Vec2) Normalize() {
-	me.Scale(1 / me.Magnitude())
+	me.Divide(me.Magnitude())
 }
 
 //	Normalizes `me` in-place, safely checking for division-by-0.
 func (me *Vec2) NormalizeSafe() {
-	mag := me.Magnitude()
-	if mag != 0 {
-		mag = 1 / mag
+	if mag := me.Magnitude(); mag != 0 {
+		me.Divide(mag)
+	} else {
+		me.Clear()
 	}
-	me.Scale(mag)
 }
 
 //	Returns a new `*Vec2` that is the normalized representation of `me` without checking for division-by-0.
 func (me *Vec2) Normalized() *Vec2 {
-	return me.Scaled(1 / me.Magnitude())
+	return me.Divided(me.Magnitude())
 }
 
 //	Returns a new `*Vec2` that is the normalized representation of `me`, safely checking for division-by-0.
 func (me *Vec2) NormalizedSafe() *Vec2 {
-	mag := me.Magnitude()
-	if mag != 0 {
-		mag = 1 / mag
+	if mag := me.Magnitude(); mag != 0 {
+		return me.Divided(mag)
 	}
-	return me.Scaled(mag)
+	return &Vec2{0, 0}
 }
 
 //	Returns a new `*Vec2` that is the normalized representation of `me` scaled by `factor` without checking for division-by-0.
 func (me *Vec2) NormalizedScaled(factor float64) *Vec2 {
-	return me.Scaled(factor * (1 / me.Magnitude()))
-	// vec := me.Normalized()
-	// vec.Scale(factor)
-	// return vec
+	return me.Normalized().Scaled(factor)
 }
 
 //	Returns a new `*Vec2` that is the normalized representation of `me` scaled by `factor`, safely checking for division-by-0.
 func (me *Vec2) NormalizedScaledSafe(factor float64) *Vec2 {
-	mag := me.Magnitude()
-	if mag != 0 {
-		mag = 1 / mag
-	}
-	return me.Scaled(factor * mag)
+	return me.NormalizedSafe().Scaled(factor)
 }
 
 //	Multiplies all components in `me` with `factor`.
@@ -180,22 +184,17 @@ func (me *Vec2) Set(x, y float64) {
 	me.X, me.Y = x, y
 }
 
-//	Alias for `me.Length()`
-func (me *Vec2) SqrMagnitude() float64 {
-	return me.Length()
-}
-
 //	Returns a human-readable (imprecise) `string` representation of `me`.
 func (me *Vec2) String() string {
 	return strf("{X:%1.2f Y:%1.2f}", me.X, me.Y)
 }
 
+//	Returns a new `*Vec2` that represents `me` minus `vec`.
+func (me *Vec2) Sub(vec *Vec2) *Vec2 {
+	return &Vec2{me.X - vec.X, me.Y - vec.Y}
+}
+
 //	Subtracts `vec` from `me`.
 func (me *Vec2) Subtract(vec *Vec2) {
 	me.X, me.Y = me.X-vec.X, me.Y-vec.Y
-}
-
-//	Returns a new `*Vec2` that represents `me` minus `vec`.
-func (me *Vec2) Subtracted(vec *Vec2) *Vec2 {
-	return &Vec2{me.X - vec.X, me.Y - vec.Y}
 }

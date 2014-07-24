@@ -38,6 +38,19 @@ func Vec3_Zero() Vec3 {
 	return Vec3{0, 0, 0}
 }
 
+func Vec3_Lerp(from, to *Vec3, t float64) *Vec3 {
+	t = Clamp01(t)
+	return &Vec3{t*(to.X-from.X) + from.X, t*(to.Y-from.Y) + from.Y, t*(to.Z-from.Z) + from.Z}
+}
+
+func Vec3_Max(l, r *Vec3) *Vec3 {
+	return &Vec3{math.Max(l.X, r.X), math.Max(l.Y, r.Y), math.Max(l.Z, r.Z)}
+}
+
+func Vec3_Min(l, r *Vec3) *Vec3 {
+	return &Vec3{math.Min(l.X, r.X), math.Min(l.Y, r.Y), math.Min(l.Z, r.Z)}
+}
+
 //	Represents a 3-dimensional vector.
 type Vec3 struct {
 	X, Y, Z float64
@@ -63,9 +76,9 @@ func (me *Vec3) Add3(x, y, z float64) {
 	me.X, me.Y, me.Z = me.X+x, me.Y+y, me.Z+z
 }
 
-//	Returns whether all 3 components in `me` equal `val`.
+//	Returns whether all 3 components in `me` are approximately equivalent to their respective counterparts in `val`.
 func (me *Vec3) AllEq(val float64) bool {
-	return Approx(me.X, val) && Approx(me.Y, val) && Approx(me.Z, val)
+	return Eq(me.X, val) && Eq(me.Y, val) && Eq(me.Z, val)
 }
 
 //	Returns whether all 3 components in `me` are greater than or equal to their respective component counterparts in `vec`.
@@ -156,9 +169,13 @@ func (me *Vec3) Div(vec *Vec3) *Vec3 {
 	return &Vec3{me.X / vec.X, me.Y / vec.Y, me.Z / vec.Z}
 }
 
+func (me *Vec3) Divide(d float64) {
+	me.X, me.Y, me.Z = me.X/d, me.Y/d, me.Z/d
+}
+
 //	Returns a new `*Vec3` that represents all 3 components in `me`, each divided by `val`.
-func (me *Vec3) Div1(val float64) *Vec3 {
-	return &Vec3{me.X / val, me.Y / val, me.Z / val}
+func (me *Vec3) Divided(d float64) *Vec3 {
+	return &Vec3{me.X / d, me.Y / d, me.Z / d}
 }
 
 //	Returns the dot-product of `me` and `vec`.
@@ -172,12 +189,12 @@ func (me *Vec3) DotSub(vec1, vec2 *Vec3) float64 {
 }
 
 func (me *Vec3) Eq(vec *Vec3) bool {
-	return me.Sub(vec).Length() < 9.99999944E-11
+	return me.Sub(vec).Length() < EpsilonEqVec
 }
 
 //	Returns the 3D vector length of `me`.
 func (me *Vec3) Length() float64 {
-	return (me.X * me.X) + (me.Y * me.Y) + (me.Z * me.Z)
+	return me.Dot(me)
 }
 
 //	Returns the 3D vector magnitude of `me`.
@@ -222,26 +239,26 @@ func (me *Vec3) Negated() *Vec3 {
 
 //	Normalizes `me` in-place without checking for division-by-0.
 func (me *Vec3) Normalize() {
-	me.Scale(1 / me.Magnitude())
+	me.Divide(me.Magnitude())
 }
 
 //	Normalizes `me` in-place, safely checking for division-by-0.
 func (me *Vec3) NormalizeSafe() {
-	mag := me.Magnitude()
-	if mag != 0 {
-		mag = 1 / mag
+	if mag := me.Magnitude(); mag != 0 {
+		me.Divide(mag)
+	} else {
+		me.Clear()
 	}
-	me.Scale(mag)
 }
 
 //	Returns a new `*Vec3` that represents `me`, normalized.
 func (me *Vec3) Normalized() *Vec3 {
-	return me.Scaled(1 / me.Magnitude())
+	return me.Divided(me.Magnitude())
 }
 
 //	Returns a new `*Vec3` that represents `me` normalized, then scaled by `factor`.
 func (me *Vec3) NormalizedScaled(factor float64) (vec *Vec3) {
-	return me.Scaled(factor * (1 / me.Magnitude()))
+	return me.Normalized().Scaled(factor)
 }
 
 //	Returns a new `*Vec3` representing `1/me`.
@@ -335,6 +352,10 @@ func (me *Vec3) SetFromMad(mul1, mul2, add *Vec3) {
 	me.X, me.Y, me.Z = mul1.X*mul2.X+add.X, mul1.Y*mul2.Y+add.Y, mul1.Z*mul2.Z+add.Z
 }
 
+func (me *Vec3) SetFromDivided(vec *Vec3, d float64) {
+	me.X, me.Y, me.Z = vec.X/d, vec.Y/d, vec.Z/d
+}
+
 //	`me = v1 * v2`
 func (me *Vec3) SetFromMult(v1, v2 *Vec3) {
 	me.X, me.Y, me.Z = v1.X*v2.X, v1.Y*v2.Y, v1.Z*v2.Z
@@ -357,7 +378,7 @@ func (me *Vec3) SetFromNegated(vec *Vec3) {
 
 //	Sets `me` to `vec` normalized.
 func (me *Vec3) SetFromNormalized(vec *Vec3) {
-	me.SetFromScaled(vec, 1/vec.Magnitude())
+	me.SetFromDivided(vec, vec.Magnitude())
 }
 
 //	Sets `me` to the inverse of `vec`.
@@ -456,7 +477,7 @@ func (me *Vec3) SubScaled(vec *Vec3, val float64) *Vec3 {
 }
 
 //	Subtracts `vec` from `me`.
-func (me *Vec3) SubVec(vec *Vec3) {
+func (me *Vec3) Subtract(vec *Vec3) {
 	me.X, me.Y, me.Z = me.X-vec.X, me.Y-vec.Y, me.Z-vec.Z
 }
 

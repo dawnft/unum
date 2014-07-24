@@ -4,9 +4,30 @@ import (
 	"math"
 )
 
+func Vec4_Lerp(from, to *Vec4, t float64) *Vec4 {
+	t = Clamp01(t)
+	return &Vec4{t*(to.X-from.X) + from.X, t*(to.Y-from.Y) + from.Y, t*(to.Z-from.Z) + from.Z, t*(to.W-from.W) + from.W}
+}
+
+func Vec4_Max(l, r *Vec4) *Vec4 {
+	return &Vec4{math.Max(l.X, r.X), math.Max(l.Y, r.Y), math.Max(l.Z, r.Z), math.Max(l.W, r.W)}
+}
+
+func Vec4_Min(l, r *Vec4) *Vec4 {
+	return &Vec4{math.Min(l.X, r.X), math.Min(l.Y, r.Y), math.Min(l.Z, r.Z), math.Min(l.W, r.W)}
+}
+
 //	Represents an arbitrary 4-dimensional vector or a Quaternion.
 type Vec4 struct {
 	X, Y, Z, W float64
+}
+
+func (me *Vec4) AddedDiv(a *Vec4, d float64) *Vec4 {
+	return &Vec4{me.X + a.X/d, me.Y + a.Y/d, me.Z + a.Z/d, me.W + a.W/d}
+}
+
+func (me *Vec4) Clear() {
+	me.X, me.Y, me.Z, me.W = 0, 0, 0, 0
 }
 
 //	Returns a new `*Vec4` containing a copy of `me`.
@@ -27,14 +48,67 @@ func (me *Vec4) Conjugated() (v *Vec4) {
 	return
 }
 
+func (me *Vec4) Distance(vec *Vec4) float64 {
+	return me.Sub(vec).Magnitude()
+}
+
+func (me *Vec4) Divide(d float64) {
+	me.X, me.Y, me.Z, me.W = me.X/d, me.Y/d, me.Z/d, me.W/d
+}
+
+func (me *Vec4) Divided(d float64) *Vec4 {
+	return &Vec4{me.X / d, me.Y / d, me.Z / d, me.W / d}
+}
+
+func (me *Vec4) Dot(vec *Vec4) float64 {
+	return me.X*vec.X + me.Y*vec.Y + me.Z*vec.Z + me.W*vec.W
+}
+
+func (me *Vec4) Eq(vec *Vec4) bool {
+	return me.Sub(vec).Length() < EpsilonEqVec
+}
+
 //	Returns the 4D vector length of `me`.
 func (me *Vec4) Length() float64 {
-	return (me.X * me.X) + (me.Y * me.Y) + (me.Z * me.Z) + (me.W * me.W)
+	return me.Dot(me)
 }
 
 //	Returns the 4D vector magnitude of `me`.
 func (me *Vec4) Magnitude() float64 {
 	return math.Sqrt(me.Length())
+}
+
+func (me *Vec4) MoveTowards(target *Vec4, maxDistanceDelta float64) *Vec4 {
+	a := target.Sub(me)
+	m := a.Magnitude()
+	if m <= maxDistanceDelta || m == 0 {
+		return target
+	}
+	return me.AddedDiv(a, m*maxDistanceDelta)
+}
+
+//	Sets `me` to the result of multiplying the specified `*Mat4` with the specified `*Vec3`.
+func (me *Vec4) MultMat4Vec3(mat *Mat4, vec *Vec3) {
+	me.X = (mat[0] * vec.X) + (mat[4] * vec.Y) + (mat[8] * vec.Z) + (mat[12] * 1)
+	me.Y = (mat[1] * vec.X) + (mat[5] * vec.Y) + (mat[9] * vec.Z) + (mat[13] * 1)
+	me.Z = (mat[2] * vec.X) + (mat[6] * vec.Y) + (mat[10] * vec.Z) + (mat[14] * 1)
+	me.W = (mat[3] * vec.X) + (mat[7] * vec.Y) + (mat[11] * vec.Z) + (mat[15] * 1)
+}
+
+//	Sets `me` to the result of multiplying the specified `*Mat4` with the specified `*Vec4`.
+func (me *Vec4) MultMat4Vec4(mat *Mat4, vec *Vec4) {
+	me.X = (mat[0] * vec.X) + (mat[4] * vec.Y) + (mat[8] * vec.Z) + (mat[12] * vec.W)
+	me.Y = (mat[1] * vec.X) + (mat[5] * vec.Y) + (mat[9] * vec.Z) + (mat[13] * vec.W)
+	me.Z = (mat[2] * vec.X) + (mat[6] * vec.Y) + (mat[10] * vec.Z) + (mat[14] * vec.W)
+	me.W = (mat[3] * vec.X) + (mat[7] * vec.Y) + (mat[11] * vec.Z) + (mat[15] * vec.W)
+}
+
+func (me *Vec4) Negate() {
+	me.X, me.Y, me.Z, me.W = -me.X, -me.Y, -me.Z, -me.W
+}
+
+func (me *Vec4) Negated() *Vec4 {
+	return &Vec4{-me.X, -me.Y, -me.Z, -me.W}
 }
 
 //	Normalizes `me` according to `me.Magnitude`.
@@ -45,21 +119,27 @@ func (me *Vec4) Normalize() {
 //	Normalizes `me` according to the specified `magnitude`.
 func (me *Vec4) NormalizeFrom(magnitude float64) {
 	if magnitude == 0 {
-		me.X, me.Y, me.Z, me.W = 0, 0, 0, 0
+		me.Clear()
 	} else {
-		magnitude = 1 / magnitude
-		me.X, me.Y, me.Z, me.W = me.X*magnitude, me.Y*magnitude, me.Z*magnitude, me.W*magnitude
+		me.Divide(magnitude)
 	}
 }
 
 //	Returns a new `*Vec4` that represents `me` normalized according to `me.Magnitude`.
 func (me *Vec4) Normalized() *Vec4 {
-	var q Vec4
 	if mag := me.Magnitude(); mag != 0 {
-		mag = 1 / mag
-		q.X, q.Y, q.Z, q.W = me.X*mag, me.Y*mag, me.Z*mag, me.W*mag
+		return me.Divided(mag)
+	} else {
+		return &Vec4{0, 0, 0, 0}
 	}
-	return &q
+}
+
+func (me *Vec4) Project(vec *Vec4) {
+	me.Scale(me.Dot(vec) / vec.Length())
+}
+
+func (me *Vec4) Projected(vec *Vec4) *Vec4 {
+	return vec.Scaled(me.Dot(vec) / vec.Length())
 }
 
 //	Sets `me` to `c` conjugated.
@@ -80,20 +160,8 @@ func (me *Vec4) Scale(v float64) {
 	me.X, me.Y, me.Z, me.W = me.X*v, me.Y*v, me.Z*v, me.W*v
 }
 
-//	Sets `me` to the result of multiplying the specified `*Mat4` with the specified `*Vec3`.
-func (me *Vec4) MultMat4Vec3(mat *Mat4, vec *Vec3) {
-	me.X = (mat[0] * vec.X) + (mat[4] * vec.Y) + (mat[8] * vec.Z) + (mat[12] * 1)
-	me.Y = (mat[1] * vec.X) + (mat[5] * vec.Y) + (mat[9] * vec.Z) + (mat[13] * 1)
-	me.Z = (mat[2] * vec.X) + (mat[6] * vec.Y) + (mat[10] * vec.Z) + (mat[14] * 1)
-	me.W = (mat[3] * vec.X) + (mat[7] * vec.Y) + (mat[11] * vec.Z) + (mat[15] * 1)
-}
-
-//	Sets `me` to the result of multiplying the specified `*Mat4` with the specified `*Vec4`.
-func (me *Vec4) MultMat4Vec4(mat *Mat4, vec *Vec4) {
-	me.X = (mat[0] * vec.X) + (mat[4] * vec.Y) + (mat[8] * vec.Z) + (mat[12] * vec.W)
-	me.Y = (mat[1] * vec.X) + (mat[5] * vec.Y) + (mat[9] * vec.Z) + (mat[13] * vec.W)
-	me.Z = (mat[2] * vec.X) + (mat[6] * vec.Y) + (mat[10] * vec.Z) + (mat[14] * vec.W)
-	me.W = (mat[3] * vec.X) + (mat[7] * vec.Y) + (mat[11] * vec.Z) + (mat[15] * vec.W)
+func (me *Vec4) Scaled(v float64) *Vec4 {
+	return &Vec4{me.X * v, me.Y * v, me.Z * v, me.W * v}
 }
 
 //	Applies various 4D vector component computations of `q` and `v` to `me`, as needed by the `Vec3.RotateRad` method.
@@ -109,11 +177,19 @@ func (me *Vec4) SetFromMultMat4(mat *Mat4) {
 	me.MultMat4Vec4(mat, me.Clone())
 }
 
-func (me *Vec4) Set3(vec *Vec3) {
+func (me *Vec4) SetFromVec3(vec *Vec3) {
 	me.X, me.Y, me.Z = vec.X, vec.Y, vec.Z
 }
 
 //	Returns a human-readable (imprecise) `string` representation of `me`.
 func (me *Vec4) String() string {
 	return strf("{X:%1.2f Y:%1.2f Z:%1.2f W:%1.2f}", me.X, me.Y, me.Z, me.W)
+}
+
+func (me *Vec4) Sub(vec *Vec4) *Vec4 {
+	return &Vec4{me.X - vec.X, me.Y - vec.Y, me.Z - vec.Z, me.W - vec.W}
+}
+
+func (me *Vec4) Subtract(vec *Vec4) {
+	me.X, me.Y, me.Z, me.W = me.X-vec.X, me.Y-vec.Y, me.Z-vec.Z, me.W-vec.W
 }

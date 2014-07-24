@@ -9,9 +9,6 @@ quaternions.
 
 ```go
 const (
-	Pi_2   = math.Pi * 2
-	Pi_Rcp = 1 / math.Pi
-
 	Deg2Rad = math.Pi / 180
 	Rad2Deg = 180 / math.Pi
 )
@@ -19,18 +16,14 @@ const (
 
 ```go
 var (
-	Infinity         = math.Inf(1)
-	NegativeInfinity = math.Inf(-1)
-	Epsilon          = math.Nextafter(1, Infinity) - 1
+	Infinity             = math.Inf(1)
+	NegativeInfinity     = math.Inf(-1)
+	Epsilon              = math.Nextafter(1, Infinity) - 1
+	EpsilonEqFloat       = 1.121039E-44
+	EpsilonEqFloatFactor = 1E-06
+	EpsilonEqVec         = 9.99999944E-11
 )
 ```
-
-#### func  Approx
-
-```go
-func Approx(a, b float64) bool
-```
-Compares two floating point values if they are similar.
 
 #### func  Clamp
 
@@ -66,6 +59,13 @@ Converts the specified `degrees` to radians.
 func DeltaAngle(cur, target float64) float64
 ```
 Calculates the shortest difference between two given angles.
+
+#### func  Eq
+
+```go
+func Eq(a, b float64) bool
+```
+Compares two floating point values if they are approximately equivalent.
 
 #### func  InverseLerp
 
@@ -520,13 +520,13 @@ func Vec2_Lerp(from, to *Vec2, t float64) *Vec2
 #### func  Vec2_Max
 
 ```go
-func Vec2_Max(lhs, rhs *Vec2) *Vec2
+func Vec2_Max(l, r *Vec2) *Vec2
 ```
 
 #### func  Vec2_Min
 
 ```go
-func Vec2_Min(lhs, rhs *Vec2) *Vec2
+func Vec2_Min(l, r *Vec2) *Vec2
 ```
 
 #### func  Vec2_One
@@ -587,6 +587,12 @@ func (me *Vec2) AngleRad(to *Vec2) float64
 func (me *Vec2) ClampMagnitude(maxLength float64) *Vec2
 ```
 
+#### func (*Vec2) Clear
+
+```go
+func (me *Vec2) Clear()
+```
+
 #### func (*Vec2) Distance
 
 ```go
@@ -608,6 +614,18 @@ func (me *Vec2) DivSafe(vec *Vec2) *Vec2
 ```
 Returns a new `*Vec2` that is the result of dividing `me` by `vec`, safely
 checking for division-by-0.
+
+#### func (*Vec2) Divide
+
+```go
+func (me *Vec2) Divide(d float64)
+```
+
+#### func (*Vec2) Divided
+
+```go
+func (me *Vec2) Divided(d float64) *Vec2
+```
 
 #### func (*Vec2) Dot
 
@@ -721,13 +739,6 @@ Returns a new `*Vec2` that represents `me` scaled by `factor`.
 func (me *Vec2) Set(x, y float64)
 ```
 
-#### func (*Vec2) SqrMagnitude
-
-```go
-func (me *Vec2) SqrMagnitude() float64
-```
-Alias for `me.Length()`
-
 #### func (*Vec2) String
 
 ```go
@@ -735,19 +746,19 @@ func (me *Vec2) String() string
 ```
 Returns a human-readable (imprecise) `string` representation of `me`.
 
+#### func (*Vec2) Sub
+
+```go
+func (me *Vec2) Sub(vec *Vec2) *Vec2
+```
+Returns a new `*Vec2` that represents `me` minus `vec`.
+
 #### func (*Vec2) Subtract
 
 ```go
 func (me *Vec2) Subtract(vec *Vec2)
 ```
 Subtracts `vec` from `me`.
-
-#### func (*Vec2) Subtracted
-
-```go
-func (me *Vec2) Subtracted(vec *Vec2) *Vec2
-```
-Returns a new `*Vec2` that represents `me` minus `vec`.
 
 #### type Vec3
 
@@ -781,6 +792,24 @@ func Vec3_Fwd() Vec3
 
 ```go
 func Vec3_Left() Vec3
+```
+
+#### func  Vec3_Lerp
+
+```go
+func Vec3_Lerp(from, to *Vec3, t float64) *Vec3
+```
+
+#### func  Vec3_Max
+
+```go
+func Vec3_Max(l, r *Vec3) *Vec3
+```
+
+#### func  Vec3_Min
+
+```go
+func Vec3_Min(l, r *Vec3) *Vec3
 ```
 
 #### func  Vec3_One
@@ -840,7 +869,8 @@ Returns the sum of `me` and `vec`.
 ```go
 func (me *Vec3) AllEq(val float64) bool
 ```
-Returns whether all 3 components in `me` equal `val`.
+Returns whether all 3 components in `me` are approximately equivalent to their
+respective counterparts in `val`.
 
 #### func (*Vec3) AllGEq
 
@@ -942,10 +972,16 @@ func (me *Vec3) Div(vec *Vec3) *Vec3
 ```
 Returns a new `*Vec3` that represents `me` divided by `vec`.
 
-#### func (*Vec3) Div1
+#### func (*Vec3) Divide
 
 ```go
-func (me *Vec3) Div1(val float64) *Vec3
+func (me *Vec3) Divide(d float64)
+```
+
+#### func (*Vec3) Divided
+
+```go
+func (me *Vec3) Divided(d float64) *Vec3
 ```
 Returns a new `*Vec3` that represents all 3 components in `me`, each divided by
 `val`.
@@ -1178,6 +1214,12 @@ func (me *Vec3) SetFromDegToRad(deg *Vec3)
 Sets each vector component in `me` to the radian equivalent of the degree angle
 stored in the respective corresponding component of `vec`.
 
+#### func (*Vec3) SetFromDivided
+
+```go
+func (me *Vec3) SetFromDivided(vec *Vec3, d float64)
+```
+
 #### func (*Vec3) SetFromMad
 
 ```go
@@ -1348,10 +1390,10 @@ func (me *Vec3) SubScaled(vec *Vec3, val float64) *Vec3
 ```
 Returns a new `*Vec3` that represents `(me - vec) * val`.
 
-#### func (*Vec3) SubVec
+#### func (*Vec3) Subtract
 
 ```go
-func (me *Vec3) SubVec(vec *Vec3)
+func (me *Vec3) Subtract(vec *Vec3)
 ```
 Subtracts `vec` from `me`.
 
@@ -1379,6 +1421,36 @@ type Vec4 struct {
 
 Represents an arbitrary 4-dimensional vector or a Quaternion.
 
+#### func  Vec4_Lerp
+
+```go
+func Vec4_Lerp(from, to *Vec4, t float64) *Vec4
+```
+
+#### func  Vec4_Max
+
+```go
+func Vec4_Max(l, r *Vec4) *Vec4
+```
+
+#### func  Vec4_Min
+
+```go
+func Vec4_Min(l, r *Vec4) *Vec4
+```
+
+#### func (*Vec4) AddedDiv
+
+```go
+func (me *Vec4) AddedDiv(a *Vec4, d float64) *Vec4
+```
+
+#### func (*Vec4) Clear
+
+```go
+func (me *Vec4) Clear()
+```
+
 #### func (*Vec4) Clone
 
 ```go
@@ -1400,6 +1472,36 @@ func (me *Vec4) Conjugated() (v *Vec4)
 ```
 Returns a new `*Vec4` that represents `me` conjugated.
 
+#### func (*Vec4) Distance
+
+```go
+func (me *Vec4) Distance(vec *Vec4) float64
+```
+
+#### func (*Vec4) Divide
+
+```go
+func (me *Vec4) Divide(d float64)
+```
+
+#### func (*Vec4) Divided
+
+```go
+func (me *Vec4) Divided(d float64) *Vec4
+```
+
+#### func (*Vec4) Dot
+
+```go
+func (me *Vec4) Dot(vec *Vec4) float64
+```
+
+#### func (*Vec4) Eq
+
+```go
+func (me *Vec4) Eq(vec *Vec4) bool
+```
+
 #### func (*Vec4) Length
 
 ```go
@@ -1413,6 +1515,12 @@ Returns the 4D vector length of `me`.
 func (me *Vec4) Magnitude() float64
 ```
 Returns the 4D vector magnitude of `me`.
+
+#### func (*Vec4) MoveTowards
+
+```go
+func (me *Vec4) MoveTowards(target *Vec4, maxDistanceDelta float64) *Vec4
+```
 
 #### func (*Vec4) MultMat4Vec3
 
@@ -1429,6 +1537,18 @@ func (me *Vec4) MultMat4Vec4(mat *Mat4, vec *Vec4)
 ```
 Sets `me` to the result of multiplying the specified `*Mat4` with the specified
 `*Vec4`.
+
+#### func (*Vec4) Negate
+
+```go
+func (me *Vec4) Negate()
+```
+
+#### func (*Vec4) Negated
+
+```go
+func (me *Vec4) Negated() *Vec4
+```
 
 #### func (*Vec4) Normalize
 
@@ -1452,6 +1572,18 @@ func (me *Vec4) Normalized() *Vec4
 Returns a new `*Vec4` that represents `me` normalized according to
 `me.Magnitude`.
 
+#### func (*Vec4) Project
+
+```go
+func (me *Vec4) Project(vec *Vec4)
+```
+
+#### func (*Vec4) Projected
+
+```go
+func (me *Vec4) Projected(vec *Vec4) *Vec4
+```
+
 #### func (*Vec4) Scale
 
 ```go
@@ -1459,10 +1591,10 @@ func (me *Vec4) Scale(v float64)
 ```
 Scales all 4 vector components in `me` by factor `v`.
 
-#### func (*Vec4) Set3
+#### func (*Vec4) Scaled
 
 ```go
-func (me *Vec4) Set3(vec *Vec3)
+func (me *Vec4) Scaled(v float64) *Vec4
 ```
 
 #### func (*Vec4) SetFromConjugated
@@ -1495,12 +1627,30 @@ func (me *Vec4) SetFromMultMat4(mat *Mat4)
 ```
 Sets `me` to the result of multiplying the specified `*Mat4` with `me`.
 
+#### func (*Vec4) SetFromVec3
+
+```go
+func (me *Vec4) SetFromVec3(vec *Vec3)
+```
+
 #### func (*Vec4) String
 
 ```go
 func (me *Vec4) String() string
 ```
 Returns a human-readable (imprecise) `string` representation of `me`.
+
+#### func (*Vec4) Sub
+
+```go
+func (me *Vec4) Sub(vec *Vec4) *Vec4
+```
+
+#### func (*Vec4) Subtract
+
+```go
+func (me *Vec4) Subtract(vec *Vec4)
+```
 
 --
 **godocdown** http://github.com/robertkrimen/godocdown

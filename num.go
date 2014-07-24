@@ -11,16 +11,13 @@ const (
 )
 
 var (
-	Infinity         = math.Inf(1)
-	NegativeInfinity = math.Inf(-1)
-	Epsilon          = math.Nextafter(1, Infinity) - 1
+	Infinity             = math.Inf(1)
+	NegativeInfinity     = math.Inf(-1)
+	Epsilon              = math.Nextafter(1, Infinity) - 1
+	EpsilonEqFloat       = 1.121039E-44
+	EpsilonEqFloatFactor = 1E-06
+	EpsilonEqVec         = 9.99999944E-11
 )
-
-//	Compares two floating point values if they are similar.
-func Approx(a, b float64) bool {
-	diff := math.Abs(b - a)
-	return diff <= Epsilon || diff < math.Max(1.121039E-44, 1E-06*math.Max(math.Abs(a), math.Abs(b)))
-}
 
 //	Clamps `val` between `c0` and `c1`.
 func Clamp(val, c0, c1 float64) float64 {
@@ -56,6 +53,12 @@ func DegToRad(degrees float64) float64 {
 func DeltaAngle(cur, target float64) float64 {
 	sin, cos := math.Sincos(target - cur)
 	return math.Atan2(sin, cos) // HACK: could be atan2(cos,sin) instead of atan2(sin,cos) ...
+}
+
+//	Compares two floating point values if they are approximately equivalent.
+func Eq(a, b float64) bool {
+	diff := math.Abs(b - a)
+	return diff <= Epsilon || diff < math.Max(EpsilonEqFloat, EpsilonEqFloatFactor*math.Max(math.Abs(a), math.Abs(b)))
 }
 
 //	Calculates the Lerp parameter between of two values.
