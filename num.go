@@ -6,14 +6,8 @@ import (
 )
 
 const (
-	Pi2       = math.Pi * 2
-	PiDiv180  = math.Pi / 180
-	PiDiv360  = math.Pi / 360
-	PiRcp     = 1 / math.Pi
-	PiRcpHalf = 0.5 / math.Pi
-
-	Deg2Rad = Pi2 / 360
-	Rad2Deg = 360 / Pi2
+	Deg2Rad = math.Pi / 180
+	Rad2Deg = 180 / math.Pi
 )
 
 var (
