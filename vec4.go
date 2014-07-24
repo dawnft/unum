@@ -4,6 +4,14 @@ import (
 	"math"
 )
 
+func Vec4_One() Vec4 {
+	return Vec4{1, 1, 1, 1}
+}
+
+func Vec4_Zero() Vec4 {
+	return Vec4{0, 0, 0, 0}
+}
+
 func Vec4_Lerp(from, to *Vec4, t float64) *Vec4 {
 	t = Clamp01(t)
 	return &Vec4{t*(to.X-from.X) + from.X, t*(to.Y-from.Y) + from.Y, t*(to.Z-from.Z) + from.Z, t*(to.W-from.W) + from.W}
@@ -17,13 +25,14 @@ func Vec4_Min(l, r *Vec4) *Vec4 {
 	return &Vec4{math.Min(l.X, r.X), math.Min(l.Y, r.Y), math.Min(l.Z, r.Z), math.Min(l.W, r.W)}
 }
 
-//	Represents an arbitrary 4-dimensional vector or a Quaternion.
+//	Represents an arbitrary 4-dimensional vector.
 type Vec4 struct {
 	X, Y, Z, W float64
 }
 
 func (me *Vec4) AddedDiv(a *Vec4, d float64) *Vec4 {
-	return &Vec4{me.X + a.X/d, me.Y + a.Y/d, me.Z + a.Z/d, me.W + a.W/d}
+	d = 1 / d
+	return &Vec4{a.X*d + me.X, a.Y*d + me.Y, a.Z*d + me.Z, a.W*d + me.W}
 }
 
 func (me *Vec4) Clear() {
@@ -53,11 +62,13 @@ func (me *Vec4) Distance(vec *Vec4) float64 {
 }
 
 func (me *Vec4) Divide(d float64) {
-	me.X, me.Y, me.Z, me.W = me.X/d, me.Y/d, me.Z/d, me.W/d
+	d = 1 / d
+	me.X, me.Y, me.Z, me.W = me.X*d, me.Y*d, me.Z*d, me.W*d
 }
 
 func (me *Vec4) Divided(d float64) *Vec4 {
-	return &Vec4{me.X / d, me.Y / d, me.Z / d, me.W / d}
+	d = 1 / d
+	return &Vec4{me.X * d, me.Y * d, me.Z * d, me.W * d}
 }
 
 func (me *Vec4) Dot(vec *Vec4) float64 {
@@ -96,7 +107,7 @@ func (me *Vec4) MultMat4Vec3(mat *Mat4, vec *Vec3) {
 }
 
 //	Sets `me` to the result of multiplying the specified `*Mat4` with the specified `*Vec4`.
-func (me *Vec4) MultMat4Vec4(mat *Mat4, vec *Vec4) {
+func (me *Vec4) Mult_Mat4Vec4(mat *Mat4, vec *Vec4) {
 	me.X = (mat[0] * vec.X) + (mat[4] * vec.Y) + (mat[8] * vec.Z) + (mat[12] * vec.W)
 	me.Y = (mat[1] * vec.X) + (mat[5] * vec.Y) + (mat[9] * vec.Z) + (mat[13] * vec.W)
 	me.Z = (mat[2] * vec.X) + (mat[6] * vec.Y) + (mat[10] * vec.Z) + (mat[14] * vec.W)
@@ -118,16 +129,16 @@ func (me *Vec4) Normalize() {
 
 //	Normalizes `me` according to the specified `magnitude`.
 func (me *Vec4) NormalizeFrom(magnitude float64) {
-	if magnitude == 0 {
-		me.Clear()
-	} else {
+	if magnitude > 0 {
 		me.Divide(magnitude)
+	} else {
+		me.Clear()
 	}
 }
 
 //	Returns a new `*Vec4` that represents `me` normalized according to `me.Magnitude`.
 func (me *Vec4) Normalized() *Vec4 {
-	if mag := me.Magnitude(); mag != 0 {
+	if mag := me.Magnitude(); mag > 0 {
 		return me.Divided(mag)
 	} else {
 		return &Vec4{0, 0, 0, 0}
@@ -173,8 +184,8 @@ func (me *Vec4) SetFromMult3(q *Vec4, v *Vec3) {
 }
 
 //	Sets `me` to the result of multiplying the specified `*Mat4` with `me`.
-func (me *Vec4) SetFromMultMat4(mat *Mat4) {
-	me.MultMat4Vec4(mat, me.Clone())
+func (me *Vec4) SetFromMult_Mat4(mat *Mat4) {
+	me.Mult_Mat4Vec4(mat, me.Clone())
 }
 
 func (me *Vec4) SetFromVec3(vec *Vec3) {

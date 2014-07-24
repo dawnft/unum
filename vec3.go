@@ -81,7 +81,7 @@ func (me *Vec3) AllEq(val float64) bool {
 	return Eq(me.X, val) && Eq(me.Y, val) && Eq(me.Z, val)
 }
 
-//	Returns whether all 3 components in `me` are greater than or equal to their respective component counterparts in `vec`.
+//	Returns whether all 3 components in `me` are greater than (or approximately equivalent to) their respective component counterparts in `vec`.
 func (me *Vec3) AllGEq(vec *Vec3) bool {
 	return (me.X >= vec.X) && (me.Y >= vec.Y) && (me.Z >= vec.Z)
 }
@@ -91,7 +91,7 @@ func (me *Vec3) AllIn(min, max *Vec3) bool {
 	return (me.X > min.X) && (me.X < max.X) && (me.Y > min.Y) && (me.Y < max.Y) && (me.Z > min.Z) && (me.Z < max.Z)
 }
 
-//	Returns whether all 3 components in `me` are less than their respective component counterparts in `vec`.
+//	Returns whether all 3 components in `me` are less than (or approximately equivalent to) their respective component counterparts in `vec`.
 func (me *Vec3) AllLEq(vec *Vec3) bool {
 	return (me.X <= vec.X) && (me.Y <= vec.Y) && (me.Z <= vec.Z)
 }
@@ -170,12 +170,14 @@ func (me *Vec3) Div(vec *Vec3) *Vec3 {
 }
 
 func (me *Vec3) Divide(d float64) {
-	me.X, me.Y, me.Z = me.X/d, me.Y/d, me.Z/d
+	d = 1 / d
+	me.X, me.Y, me.Z = me.X*d, me.Y*d, me.Z*d
 }
 
 //	Returns a new `*Vec3` that represents all 3 components in `me`, each divided by `val`.
 func (me *Vec3) Divided(d float64) *Vec3 {
-	return &Vec3{me.X / d, me.Y / d, me.Z / d}
+	d = 1 / d
+	return &Vec3{me.X * d, me.Y * d, me.Z * d}
 }
 
 //	Returns the dot-product of `me` and `vec`.
@@ -244,7 +246,7 @@ func (me *Vec3) Normalize() {
 
 //	Normalizes `me` in-place, safely checking for division-by-0.
 func (me *Vec3) NormalizeSafe() {
-	if mag := me.Magnitude(); mag != 0 {
+	if mag := me.Magnitude(); mag > 0 {
 		me.Divide(mag)
 	} else {
 		me.Clear()
@@ -274,8 +276,8 @@ func (me *Vec3) RotateDeg(angleDeg float64, axis *Vec3) {
 //	Rotates `me` `angleRad` radians around the specified `axis`.
 func (me *Vec3) RotateRad(angleRad float64, axis *Vec3) {
 	var tmpQ, tmpQw, tmpQr, tmpQc Vec4
-	sin := math.Sin(angleRad)
-	tmpQr.X, tmpQr.Y, tmpQr.Z, tmpQr.W = axis.X*sin, axis.Y*sin, axis.Z*sin, math.Cos(angleRad)
+	sin, cos := math.Sincos(angleRad)
+	tmpQr.X, tmpQr.Y, tmpQr.Z, tmpQr.W = axis.X*sin, axis.Y*sin, axis.Z*sin, cos
 	tmpQc.SetFromConjugated(&tmpQr)
 	tmpQ.SetFromMult3(&tmpQr, me)
 	tmpQw.SetFromMult(&tmpQ, &tmpQc)
@@ -353,7 +355,8 @@ func (me *Vec3) SetFromMad(mul1, mul2, add *Vec3) {
 }
 
 func (me *Vec3) SetFromDivided(vec *Vec3, d float64) {
-	me.X, me.Y, me.Z = vec.X/d, vec.Y/d, vec.Z/d
+	d = 1 / d
+	me.X, me.Y, me.Z = vec.X*d, vec.Y*d, vec.Z*d
 }
 
 //	`me = v1 * v2`
@@ -463,7 +466,8 @@ func (me *Vec3) SubDivMult(sub, div, mul *Vec3) *Vec3 {
 
 //	Returns a new `*Vec3` that represents `mul * math.Floor(me / div)`.
 func (me *Vec3) SubFloorDivMult(div, mul float64) *Vec3 {
-	return me.Sub(&Vec3{mul * math.Floor(me.X/div), mul * math.Floor(me.Y/div), mul * math.Floor(me.Z/div)})
+	div = 1 / div
+	return me.Sub(&Vec3{mul * math.Floor(me.X*div), mul * math.Floor(me.Y*div), mul * math.Floor(me.Z*div)})
 }
 
 //	Returns a new `*Vec3` that represents `val` minus `me`.

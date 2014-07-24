@@ -503,6 +503,53 @@ func (me *Mat4) Transposed() (mat *Mat4)
 ```
 Returns the transpose of `me`.
 
+#### type Quat
+
+```go
+type Quat struct {
+	//	X, Y, Z, W
+	Vec4
+}
+```
+
+Quaternion
+
+#### func  NewQuat
+
+```go
+func NewQuat(x, y, z, w float64) *Quat
+```
+
+#### func (*Quat) AngleDeg
+
+```go
+func (me *Quat) AngleDeg(q *Quat) float64
+```
+
+#### func (*Quat) AngleRad
+
+```go
+func (me *Quat) AngleRad(q *Quat) float64
+```
+
+#### func (*Quat) Eq
+
+```go
+func (me *Quat) Eq(vec *Vec4) bool
+```
+
+#### func (*Quat) Mul
+
+```go
+func (me *Quat) Mul(q *Quat) *Quat
+```
+
+#### func (*Quat) MulVec3
+
+```go
+func (me *Quat) MulVec3(p *Vec3) *Vec3
+```
+
 #### type Vec2
 
 ```go
@@ -877,8 +924,8 @@ respective counterparts in `val`.
 ```go
 func (me *Vec3) AllGEq(vec *Vec3) bool
 ```
-Returns whether all 3 components in `me` are greater than or equal to their
-respective component counterparts in `vec`.
+Returns whether all 3 components in `me` are greater than (or approximately
+equivalent to) their respective component counterparts in `vec`.
 
 #### func (*Vec3) AllIn
 
@@ -893,8 +940,8 @@ than `max`.
 ```go
 func (me *Vec3) AllLEq(vec *Vec3) bool
 ```
-Returns whether all 3 components in `me` are less than their respective
-component counterparts in `vec`.
+Returns whether all 3 components in `me` are less than (or approximately
+equivalent to) their respective component counterparts in `vec`.
 
 #### func (*Vec3) AngleDeg
 
@@ -1419,7 +1466,7 @@ type Vec4 struct {
 }
 ```
 
-Represents an arbitrary 4-dimensional vector or a Quaternion.
+Represents an arbitrary 4-dimensional vector.
 
 #### func  Vec4_Lerp
 
@@ -1437,6 +1484,18 @@ func Vec4_Max(l, r *Vec4) *Vec4
 
 ```go
 func Vec4_Min(l, r *Vec4) *Vec4
+```
+
+#### func  Vec4_One
+
+```go
+func Vec4_One() Vec4
+```
+
+#### func  Vec4_Zero
+
+```go
+func Vec4_Zero() Vec4
 ```
 
 #### func (*Vec4) AddedDiv
@@ -1530,10 +1589,10 @@ func (me *Vec4) MultMat4Vec3(mat *Mat4, vec *Vec3)
 Sets `me` to the result of multiplying the specified `*Mat4` with the specified
 `*Vec3`.
 
-#### func (*Vec4) MultMat4Vec4
+#### func (*Vec4) Mult_Mat4Vec4
 
 ```go
-func (me *Vec4) MultMat4Vec4(mat *Mat4, vec *Vec4)
+func (me *Vec4) Mult_Mat4Vec4(mat *Mat4, vec *Vec4)
 ```
 Sets `me` to the result of multiplying the specified `*Mat4` with the specified
 `*Vec4`.
@@ -1620,10 +1679,10 @@ func (me *Vec4) SetFromMult3(q *Vec4, v *Vec3)
 Applies various 4D vector component computations of `q` and `v` to `me`, as
 needed by the `Vec3.RotateRad` method.
 
-#### func (*Vec4) SetFromMultMat4
+#### func (*Vec4) SetFromMult_Mat4
 
 ```go
-func (me *Vec4) SetFromMultMat4(mat *Mat4)
+func (me *Vec4) SetFromMult_Mat4(mat *Mat4)
 ```
 Sets `me` to the result of multiplying the specified `*Mat4` with `me`.
 

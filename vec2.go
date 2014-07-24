@@ -45,7 +45,8 @@ func (me *Vec2) Add(vec *Vec2) {
 }
 
 func (me *Vec2) AddedDiv(a *Vec2, d float64) *Vec2 {
-	return &Vec2{me.X + a.X/d, me.Y + a.Y/d}
+	d = 1 / d
+	return &Vec2{a.X*d + me.X, a.Y*d + me.Y}
 }
 
 func (me *Vec2) AngleDeg(to *Vec2) float64 {
@@ -77,11 +78,13 @@ func (me *Vec2) Div(vec *Vec2) *Vec2 {
 }
 
 func (me *Vec2) Divide(d float64) {
-	me.X, me.Y = me.X/d, me.Y/d
+	d = 1 / d
+	me.X, me.Y = me.X*d, me.Y*d
 }
 
 func (me *Vec2) Divided(d float64) *Vec2 {
-	return &Vec2{me.X / d, me.Y / d}
+	d = 1 / d
+	return &Vec2{me.X * d, me.Y * d}
 }
 
 //	Returns a new `*Vec2` that is the result of dividing `me` by `vec`, safely checking for division-by-0.
@@ -140,7 +143,7 @@ func (me *Vec2) Normalize() {
 
 //	Normalizes `me` in-place, safely checking for division-by-0.
 func (me *Vec2) NormalizeSafe() {
-	if mag := me.Magnitude(); mag != 0 {
+	if mag := me.Magnitude(); mag > 0 {
 		me.Divide(mag)
 	} else {
 		me.Clear()
@@ -154,7 +157,7 @@ func (me *Vec2) Normalized() *Vec2 {
 
 //	Returns a new `*Vec2` that is the normalized representation of `me`, safely checking for division-by-0.
 func (me *Vec2) NormalizedSafe() *Vec2 {
-	if mag := me.Magnitude(); mag != 0 {
+	if mag := me.Magnitude(); mag > 0 {
 		return me.Divided(mag)
 	}
 	return &Vec2{0, 0}
