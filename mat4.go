@@ -217,7 +217,7 @@ func (me *Mat4) Sub(mat *Mat4) {
 }
 
 //	Sets `mat` to the inverse of `me`.
-func (me *Mat4) ToInverseMat3(mat *Mat3) {
+func (me *Mat4) toInverseMat3(mat *Mat3) {
 	//	This method is currently in "not needed right now and not sure if actually correct" limbo.
 	a00, a01, a02 := me[0], me[1], me[2]
 	a10, a11, a12 := me[4], me[5], me[6]

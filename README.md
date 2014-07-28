@@ -63,14 +63,14 @@ Calculates the shortest difference between two given angles.
 #### func  Eq
 
 ```go
-func Eq(a, b float64) bool
+func Eq(a, b float64) (eq bool)
 ```
 Compares two floating point values if they are approximately equivalent.
 
-#### func  InverseLerp
+#### func  InvLerp
 
 ```go
-func InverseLerp(from, to, val float64) float64
+func InvLerp(from, to, val float64) float64
 ```
 Calculates the Lerp parameter between of two values.
 
@@ -118,6 +118,12 @@ func NextPowerOfTwo(v uint32) uint32
 ```
 Returns `v` if it is a power-of-two, or else the next-highest power-of-two.
 
+#### func  Percent
+
+```go
+func Percent(p, of float64) float64
+```
+
 #### func  PingPong
 
 ```go
@@ -161,6 +167,20 @@ Interpolates between `from` and `to` with smoothing at the limits.
 func SmootherStep(from, to, t float64) float64
 ```
 Interpolates between `from` and `to` with smoother smoothing at the limits.
+
+#### func  SumFrom1To
+
+```go
+func SumFrom1To(to int) int
+```
+http://betterexplained.com/articles/techniques-for-adding-the-numbers-1-to-100/
+
+#### func  SumFromTo
+
+```go
+func SumFromTo(from, to int) int
+```
+http://betterexplained.com/articles/techniques-for-adding-the-numbers-1-to-100/
 
 #### type Mat3
 
@@ -474,13 +494,6 @@ Sets `me` to the transpose of `mat`.
 func (me *Mat4) Sub(mat *Mat4)
 ```
 Subtracts `mat` from `me`.
-
-#### func (*Mat4) ToInverseMat3
-
-```go
-func (me *Mat4) ToInverseMat3(mat *Mat3)
-```
-Sets `mat` to the inverse of `me`.
 
 #### func (*Mat4) Translation
 
@@ -1230,14 +1243,6 @@ func (me *Vec3) SetFromAddSub(a, b, c *Vec3)
 ```
 `me = a + b - c`
 
-#### func (*Vec3) SetFromCos
-
-```go
-func (me *Vec3) SetFromCos(vec *Vec3)
-```
-Sets each vector component in `me` to the `math.Cos` of the respective
-corresponding component in `vec`.
-
 #### func (*Vec3) SetFromCross
 
 ```go
@@ -1321,14 +1326,6 @@ func (me *Vec3) SetFromScaled(vec *Vec3, mul float64)
 func (me *Vec3) SetFromScaledSub(vec1, vec2 *Vec3, mul float64)
 ```
 `me = (vec1 - vec2) * mul`
-
-#### func (*Vec3) SetFromSin
-
-```go
-func (me *Vec3) SetFromSin(vec *Vec3)
-```
-Sets each vector component in `me` to the `math.Sin` of the respective
-corresponding component in `vec`.
 
 #### func (*Vec3) SetFromSub
 

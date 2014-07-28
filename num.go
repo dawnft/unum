@@ -56,13 +56,16 @@ func DeltaAngle(cur, target float64) float64 {
 }
 
 //	Compares two floating point values if they are approximately equivalent.
-func Eq(a, b float64) bool {
-	diff := math.Abs(b - a)
-	return diff <= Epsilon || diff < math.Max(EpsilonEqFloat, EpsilonEqFloatFactor*math.Max(math.Abs(a), math.Abs(b)))
+func Eq(a, b float64) (eq bool) {
+	if eq = (a == b); !eq {
+		diff := math.Abs(b - a)
+		eq = diff <= Epsilon || diff < math.Max(EpsilonEqFloat, EpsilonEqFloatFactor*math.Max(math.Abs(a), math.Abs(b)))
+	}
+	return
 }
 
 //	Calculates the Lerp parameter between of two values.
-func InverseLerp(from, to, val float64) float64 {
+func InvLerp(from, to, val float64) float64 {
 	return (val - from) / (to - from)
 }
 
@@ -91,6 +94,10 @@ func NextPowerOfTwo(v uint32) uint32 {
 	v |= v >> 16
 	v++
 	return v
+}
+
+func Percent(p, of float64) float64 {
+	return p * of * 0.01
 }
 
 //	Ping-pongs the value `t`, so that it is never larger than `l` and never smaller than 0.
@@ -134,6 +141,16 @@ func SmoothStep(from, to, t float64) float64 {
 func SmootherStep(from, to, t float64) float64 {
 	t = Clamp01((t - from) / (to - from))
 	return t * t * t * (t*(t*6-15) + 10)
+}
+
+//	http://betterexplained.com/articles/techniques-for-adding-the-numbers-1-to-100/
+func SumFromTo(from, to int) int {
+	return ((to * (to + 1)) / 2) - ((from - 1) * from / 2)
+}
+
+//	http://betterexplained.com/articles/techniques-for-adding-the-numbers-1-to-100/
+func SumFrom1To(to int) int {
+	return (to * (to + 1)) / 2
 }
 
 func strf(format string, args ...interface{}) string {

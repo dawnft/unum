@@ -330,7 +330,7 @@ func (me *Vec3) SetFromAddSub(a, b, c *Vec3) {
 }
 
 //	Sets each vector component in `me` to the `math.Cos` of the respective corresponding component in `vec`.
-func (me *Vec3) SetFromCos(vec *Vec3) {
+func (me *Vec3) setFromCos(vec *Vec3) {
 	me.X, me.Y, me.Z = math.Cos(vec.X), math.Cos(vec.Y), math.Cos(vec.Z)
 }
 
@@ -398,7 +398,7 @@ func (me *Vec3) SetFromRotation(pos, rotCos, rotSin *Vec3) {
 }
 
 //	Sets each vector component in `me` to the `math.Sin` of the respective corresponding component in `vec`.
-func (me *Vec3) SetFromSin(vec *Vec3) {
+func (me *Vec3) setFromSin(vec *Vec3) {
 	me.X, me.Y, me.Z = math.Sin(vec.X), math.Sin(vec.Y), math.Sin(vec.Z)
 }
 
